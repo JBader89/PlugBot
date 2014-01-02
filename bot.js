@@ -1,34 +1,175 @@
-var PlugAPI = require('./plugapi'); // git clone (or unzip) into the same directory as your .js file. There should be plugapi/package.json, for example (and other files)
-var ROOM = 'new-to-this-shit-mrsuicidesheep';
-var UPDATECODE = '$&2h72=^^@jdBf_n!`-38UHs'; // We're not quite sure what this is yet, but the API doesn't work without it. It's possible that a future Plug update will change this, so check back here to see if this has changed, and set appropriately, if it has. You can omit using it if you wish - the value as of writing needs to be '$&2h72=^^@jdBf_n!`-38UHs', and is hardcoded into the bot in the event it is not specified below.
+var PlugAPI = require('./plugapi'); 
+var ROOM = 'terminally-chillin';
+var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
+
+var Lastfm = require('simple-lastfm');
+
+var lastfm = new Lastfm({
+    api_key: 'd657909b19fde5ac1491b756b6869d38',
+    api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
+    username: 'BaderBombs',
+    password: 'chewy767'
+});
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
     password: 'chewy767'
-}, function(err, auth) { // if err is defined, an error occurred, most likely incorrect login
+}, function(err, auth) { 
     if(err) {
-        console.log("An error occurred: " + err);
+        //console.log("An error occurred: " + err);
         return;
     }
-    //console.log(auth);
     var bot = new PlugAPI(auth, UPDATECODE);
     bot.connect(ROOM);
 
+    //Event which triggers when bot joins the room
     bot.on('roomJoin', function(data) {
-        // data object has information on the room - list of users, song currently playing, etc.
-        //console.log("Joined " + ROOM + ": ", data);
-        //bot.sendChat("Test!");
+        bot.sendChat("I'm live!");
     });
 
-    bot.on('chat', commands);
-
-    function commands (data) {
-        if (data.message===".hey") {
-            bot.sendChat("Well hey there "+data.from+"!");
+    //Event which triggers when anyone chats
+    bot.on('chat', function(data) { //TODO: 1. .grab, 2. .activate (playlist), 3. .move (song) 4. .wiki, 5. .google, 6.translate
+        var command=data.message.split(' ')[0];
+        var firstIndex=data.message.indexOf(' ');
+        var qualifier="";
+        if (firstIndex!=-1){
+            qualifier = data.message.substring(firstIndex+1, data.message.length);
         }
-        else if (data.message===".props") {
-            bot.sendChat("Nice play "+checkCurrentDJ()+"!");
-        }
-    }
+        switch (command)
+        {
+            case ".commands":
+                bot.chat("List of Commands: .artist, .commands, .genre, .hey, .join, .leave, .meh, .props, .skip, .track, and .woot");
+                break;
+            case ".hey":
+                bot.chat("Well hey there! @"+data.from);
+                break;
+            case ".woot":
+                bot.woot();
+                bot.chat("This is awesome! Nice play!");
+                break;
+            case ".meh":
+                bot.meh();
+                bot.chat("Please... make it stop :unamused:");
+                break;
+            case ".props":
+                bot.chat("Nice play! @"+bot.getDJs()[0].username);
+                break;
+            case ".join":
+                bot.waitListJoin();
+                bot.chat("Joining Waitlist!");
+                break;
+            case ".leave":
+                bot.waitListLeave();
+                break;
+            case ".skip":
+                bot.skipSong();
+                bot.chat("Skipping!");
+                break;
+            case ".artist":
+                var artistChoice="";
+                if (qualifier==""){
+                    artistChoice=bot.getMedia().author;
+                }
+                else{
+                    artistChoice=qualifier;
+                }
+                lastfm.getArtistInfo({
+                    artist: artistChoice,
+                    callback: function(result) { 
+                        //console.log(result);
+                        if (result.success==true){
+                            if (result.artistInfo.bio.summary!=""){
+                                var summary=result.artistInfo.bio.summary;
+                                summary=summary.replace(/(&quot;)/g, '"');
+                                summary=summary.replace(/(&amp;)/g, '&');
+                                summary=summary.replace(/(&eacute;)/g, 'é');
+                                summary=summary.replace(/(&aacute;)/g, 'á');
+                                summary=summary.replace(/<[^>]+>/g, '');
+                                if (summary.indexOf("1)") != -1){
+                                    summary=summary.substring(summary.indexOf("1) ") + 3);
+                                }                                    
+                                bot.chat(summary); 
+                                var lastfmArtist=artistChoice;
+                                lastfmArtist=lastfmArtist.replace(/ /g, '+');
+                                bot.chat("For more info: http://www.last.fm/music/" + lastfmArtist);
+                            }
+                            else {
+                                bot.chat("No artist info found.")
+                            }
+                        }
+                        else {
+                            bot.chat("No artist info found.")
+                        }
+                    }
+                });
+                break;
+            case ".track":
+                lastfm.getTrackInfo({
+                    artist: bot.getMedia().author,
+                    track: bot.getMedia().title,
+                    callback: function(result) {
+                        //console.log(result);
+                        if (result.success==true){
+                            if (result.trackInfo.wiki!=undefined){
+                                var summary=result.trackInfo.wiki.summary;
+                                summary=summary.replace(/(&quot;)/g, '"');
+                                summary=summary.replace(/(&amp;)/g, '&');
+                                summary=summary.replace(/(&eacute;)/g, 'é');
+                                summary=summary.replace(/(&aacute;)/g, 'á');
+                                summary=summary.replace(/<[^>]+>/g, '');
+                                bot.chat(summary);
+                            }
+                            else {
+                                bot.chat("No track info found.")
+                            }
+                        }
+                        else {
+                            bot.chat("No track info found.")
+                        }
+                    }
+                });
+                break;
+            case ".genre":
+                var artistChoice="";
+                if (qualifier==""){
+                    artistChoice=bot.getMedia().author;
+                    trackChoice=bot.getMedia().title;
+                }
+                else{
+                    artistChoice=qualifier;
+                    trackChoice=null;
+                }
+                lastfm.getTags({
+                    artist: artistChoice,
+                    track: trackChoice,
+                    callback: function(result) {
+                        //console.log(result);
+                        var tags = "";
+                        for (var index in result.tags){
+                            tags+=result.tags[index].name;
+                            tags+=", ";
+                        }
+                        tags=tags.substring(0, tags.length-2)
+                        if (qualifier==""){
+                            if (tags!=""){
+                                bot.chat("Genre of "+trackChoice+" by "+artistChoice+": "+tags);
+                            }
+                            else{
+                                bot.chat("No genre found.")
+                            }
+                        }
+                        else{
+                            if (tags!=""){
+                                bot.chat("Genre of "+artistChoice+": "+tags);
+                            }
+                            else{
+                                bot.chat("No genre found.")
+                            }
+                        }
+                    }
+                });
+                break;
+        }   
+    });
 });
