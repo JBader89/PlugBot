@@ -1,5 +1,11 @@
 PlugBot
 =======
+
+A bot for the music sharing site Plug.dj
+
+Commands
+--------
+
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.
 .commands - Returns the list of commands.
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.
