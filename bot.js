@@ -29,7 +29,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .activate (playlist), 2. .move (song) 3. .wiki, 4. .google, 5.translate, 6. define, 7. urban define
+    bot.on('chat', function(data) { //TODO: 1. .wiki, 2. .google, 3. .translate, 4. .define, 5. .urban
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -77,7 +77,7 @@ PlugAPI.getAuth({
                 lastfm.getArtistInfo({
                     artist: artistChoice,
                     callback: function(result) { 
-                        console.log(result);
+                        //console.log(result);
                         if (result.success==true){
                             if (result.artistInfo.bio.summary!=""){
                                 var summary=result.artistInfo.bio.summary;
@@ -110,7 +110,7 @@ PlugAPI.getAuth({
                     artist: bot.getMedia().author,
                     track: bot.getMedia().title,
                     callback: function(result) {
-                        console.log(result);
+                        //console.log(result);
                         if (result.success==true){
                             if (result.trackInfo.wiki!=undefined){
                                 var summary=result.trackInfo.wiki.summary;
@@ -145,7 +145,7 @@ PlugAPI.getAuth({
                     artist: artistChoice,
                     track: trackChoice,
                     callback: function(result) {
-                        console.log(result);
+                        //console.log(result);
                         var tags = "";
                         for (var index in result.tags){
                             tags+=result.tags[index].name;
@@ -173,8 +173,21 @@ PlugAPI.getAuth({
                 break;
             case ".grab":
                 bot.getPlaylists(function(playlists) {
-                    console.log(playlists, playlists.length, playlists[0]);
-                    bot.addSongToPlaylist(playlists[0].id, bot.getMedia().id);
+                    for (var i=0; i<playlists.length; i++){
+                        if (playlists[i].selected){
+                            if (playlists[i].items.length!=200){
+                                var selectedID=playlists[i].id;
+                                bot.chat("Added to "+playlists[i].name+" playlist.");
+                            }
+                            else{
+                                bot.createPlaylist("Library "+playlists.length+1);
+                                bot.activatePlaylist(playlists[playlists.length-1].id)
+                                var selectedID=playlists[playlists.length-1].id;
+                                bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                            }
+                        }
+                    }
+                    bot.addSongToPlaylist(selectedID, bot.getMedia().id);
                 });
                 break;
         }
