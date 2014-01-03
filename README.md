@@ -1,7 +1,7 @@
 PlugBot
 =======
 
-A bot for the music sharing site Plug.dj
+A Plug.dj bot for the popular music sharing site Plug.dj
 
 Commands
 --------
