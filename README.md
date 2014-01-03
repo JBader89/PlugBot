@@ -9,6 +9,7 @@ Commands
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.  
 .commands - Returns the list of commands.  
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
+.grab - Makes the bot grab the current song.
 .hey - Makes the bot greet the user.  
 .join - Makes the bot join the waitlist.  
 .leave - Makes the bot leave the waitlist.  

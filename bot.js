@@ -29,7 +29,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .grab, 2. .activate (playlist), 3. .move (song) 4. .wiki, 5. .google, 6.translate
+    bot.on('chat', function(data) { //TODO: 1. .activate (playlist), 2. .move (song) 3. .wiki, 4. .google, 5.translate, 6. define, 7. urban define
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -39,7 +39,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands":
-                bot.chat("List of Commands: .artist, .commands, .genre, .hey, .join, .leave, .meh, .props, .skip, .track, and .woot");
+                bot.chat("List of Commands: .artist, .commands, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, and .woot");
                 break;
             case ".hey":
                 bot.chat("Well hey there! @"+data.from);
@@ -77,7 +77,7 @@ PlugAPI.getAuth({
                 lastfm.getArtistInfo({
                     artist: artistChoice,
                     callback: function(result) { 
-                        //console.log(result);
+                        console.log(result);
                         if (result.success==true){
                             if (result.artistInfo.bio.summary!=""){
                                 var summary=result.artistInfo.bio.summary;
@@ -87,7 +87,8 @@ PlugAPI.getAuth({
                                 summary=summary.replace(/(&aacute;)/g, 'á');
                                 summary=summary.replace(/<[^>]+>/g, '');
                                 if (summary.indexOf("1)") != -1){
-                                    summary=summary.substring(summary.indexOf("1) ") + 3);
+                                    summary=summary.substring(summary.indexOf("1) ")+3);
+                                    summary=summary.substring(0, summary.indexOf("2)")-1);
                                 }                                    
                                 bot.chat(summary); 
                                 var lastfmArtist=artistChoice;
@@ -109,7 +110,7 @@ PlugAPI.getAuth({
                     artist: bot.getMedia().author,
                     track: bot.getMedia().title,
                     callback: function(result) {
-                        //console.log(result);
+                        console.log(result);
                         if (result.success==true){
                             if (result.trackInfo.wiki!=undefined){
                                 var summary=result.trackInfo.wiki.summary;
@@ -144,7 +145,7 @@ PlugAPI.getAuth({
                     artist: artistChoice,
                     track: trackChoice,
                     callback: function(result) {
-                        //console.log(result);
+                        console.log(result);
                         var tags = "";
                         for (var index in result.tags){
                             tags+=result.tags[index].name;
@@ -170,6 +171,12 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-        }   
+            case ".grab":
+                bot.getPlaylists(function(playlists) {
+                    console.log(playlists, playlists.length, playlists[0]);
+                    bot.addSongToPlaylist(playlists[0].id, bot.getMedia().id);
+                });
+                break;
+        }
     });
 });
