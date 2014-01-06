@@ -11,6 +11,8 @@ var lastfm = new Lastfm({
     password: 'chewy767'
 });
 
+var api = require('dictionaryapi');
+
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
@@ -53,6 +55,7 @@ PlugAPI.getAuth({
                 bot.chat("Please... make it stop :unamused:");
                 break;
             case ".props":
+            case ".propsicle":
                 bot.chat("Nice play! @"+bot.getDJs()[0].username);
                 break;
             case ".join":
@@ -88,7 +91,9 @@ PlugAPI.getAuth({
                                 summary=summary.replace(/<[^>]+>/g, '');
                                 if (summary.indexOf("1)") != -1){
                                     summary=summary.substring(summary.indexOf("1) ")+3);
-                                    summary=summary.substring(0, summary.indexOf("2)")-1);
+                                    if (summary.indexOf("2)") != -1){
+                                        summary=summary.substring(0, summary.indexOf("2)")-1);
+                                    }
                                 }                                    
                                 bot.chat(summary); 
                                 var lastfmArtist=artistChoice;
@@ -190,6 +195,42 @@ PlugAPI.getAuth({
                     bot.addSongToPlaylist(selectedID, bot.getMedia().id);
                 });
                 break;
+            case ".define":
+                var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
+                var linkQualifier=qualifier;
+                linkQualifier=linkQualifier.replace(/ /g, '%20');
+                dict.query(linkQualifier.toLowerCase(), function(err, result) {
+                    //console.log(result);
+                    result=result.replace(/<vi>(.*?)<\/vi>|<dx>(.*?)<\/dx>|<dro>(.*?)<\/dro>|<uro>(.*?)<\/uro>|<svr>(.*?)<\/svr>|<sin>(.*?)<\/sin>|<set>(.*?)<\/set>|<pl>(.*?)<\/pl>|<pt>(.*?)<\/pt>/g, '');
+                    result=result.replace(/<\/sx> <sx>|<sd>/g,', ');
+                    result=result.replace(/\s{1,}<sn>/g, '; ');
+                    result=result.replace(/\s{1,}<un>/g, ': ');
+                    result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
+                    result=result.replace(/\s{1,}:/g,': ')
+                    //console.log(result);
+                    if (result.indexOf("1:") != -1 || result.indexOf("1 a") != -1){
+                        if ((result.indexOf("1:")<result.indexOf("1 a") && result.indexOf("1:")!=-1) || result.indexOf("1 a")==-1){
+                            result=result.substring(result.indexOf("1:"));
+                        }
+                        else{
+                            result=result.substring(result.indexOf("1 a"));
+                        }
+                    }
+                    else{
+                        result=result.substring(result.indexOf(":")+1);
+                    }
+                    result=result.substring(0, result.indexOf("</entry>"));
+                    result=result.replace(/\s{1,};/g, ';');
+                    result=result.replace(/\s{1,},/g, ',');
+                    //console.log(result);
+                    if (result != ''){
+                        bot.chat(result);
+                        bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
+                    }
+                    else{
+                        bot.chat("No definition found.")
+                    }
+                });
         }
     });
 });
