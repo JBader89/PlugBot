@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'terminally-chillin';
+var ROOM = 'chillout-mixer-ambient-triphop';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -8,15 +8,17 @@ var lastfm = new Lastfm({
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'chewy767'
+    password: 'xxx'
 });
 
 var api = require('dictionaryapi');
 
+var Wiki = require("wikijs");
+
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'chewy767'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         //console.log("An error occurred: " + err);
@@ -112,31 +114,33 @@ PlugAPI.getAuth({
                 });
                 break;
             case ".track":
-                lastfm.getTrackInfo({
-                    artist: bot.getMedia().author,
-                    track: bot.getMedia().title,
-                    callback: function(result) {
-                        //console.log(result);
-                        if (result.success==true){
-                            if (result.trackInfo.wiki!=undefined){
-                                var summary=result.trackInfo.wiki.summary;
-                                summary=summary.replace(/(&quot;)/g, '"');
-                                summary=summary.replace(/(&amp;)/g, '&');
-                                summary=summary.replace(/(&eacute;)/g, 'é');
-                                summary=summary.replace(/(&aacute;)/g, 'á');
-                                summary=summary.replace(/(&auml;)/g, 'ä');
-                                summary=summary.replace(/<[^>]+>/g, '');
-                                bot.chat(summary);
+                if (data.from=='TerminallyChill'){
+                    lastfm.getTrackInfo({
+                        artist: bot.getMedia().author,
+                        track: bot.getMedia().title,
+                        callback: function(result) {
+                            //console.log(result);
+                            if (result.success==true){
+                                if (result.trackInfo.wiki!=undefined){
+                                    var summary=result.trackInfo.wiki.summary;
+                                    summary=summary.replace(/(&quot;)/g, '"');
+                                    summary=summary.replace(/(&amp;)/g, '&');
+                                    summary=summary.replace(/(&eacute;)/g, 'é');
+                                    summary=summary.replace(/(&aacute;)/g, 'á');
+                                    summary=summary.replace(/(&auml;)/g, 'ä');
+                                    summary=summary.replace(/<[^>]+>/g, '');
+                                    bot.chat(summary);
+                                }
+                                else {
+                                    bot.chat("No track info found.")
+                                }
                             }
                             else {
                                 bot.chat("No track info found.")
                             }
                         }
-                        else {
-                            bot.chat("No track info found.")
-                        }
-                    }
-                });
+                    });
+                }
                 break;
             case ".genre":
                 var artistChoice="";
@@ -179,23 +183,25 @@ PlugAPI.getAuth({
                 });
                 break;
             case ".grab":
-                bot.getPlaylists(function(playlists) {
-                    for (var i=0; i<playlists.length; i++){
-                        if (playlists[i].selected){
-                            if (playlists[i].items.length!=200){
-                                var selectedID=playlists[i].id;
-                                bot.chat("Added to "+playlists[i].name+" playlist.");
-                            }
-                            else{
-                                bot.createPlaylist("Library "+playlists.length+1);
-                                bot.activatePlaylist(playlists[playlists.length-1].id)
-                                var selectedID=playlists[playlists.length-1].id;
-                                bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                if (data.from=='TerminallyChill'){
+                    bot.getPlaylists(function(playlists) {
+                        for (var i=0; i<playlists.length; i++){
+                            if (playlists[i].selected){
+                                if (playlists[i].items.length!=200){
+                                    var selectedID=playlists[i].id;
+                                    bot.chat("Added to "+playlists[i].name+" playlist.");
+                                }
+                                else{
+                                    bot.createPlaylist("Library "+playlists.length+1);
+                                    bot.activatePlaylist(playlists[playlists.length-1].id)
+                                    var selectedID=playlists[playlists.length-1].id;
+                                    bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                                }
                             }
                         }
-                    }
-                    bot.addSongToPlaylist(selectedID, bot.getMedia().id);
-                });
+                        bot.addSongToPlaylist(selectedID, bot.getMedia().id);
+                    });
+                }
                 break;
             case ".define":
                 var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
@@ -234,6 +240,19 @@ PlugAPI.getAuth({
                         bot.chat("No definition found.")
                     }
                 });
+            case ".wiki":
+                Wiki.page(qualifier, function(err, page){
+                    page.summary(function(err, summary){
+                        if (summary!=undefined){
+                            bot.chat(summary);
+                        }
+                        else{
+                            bot.chat("No wiki found.")
+                        }
+                        //bot.chat("For more info: http://en.wikipedia.org/wiki/"+qualifier);
+                    });
+                });
+                break;
         }
     });
 });
