@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'chillout-mixer-ambient-triphop';
+var ROOM = 'psychillium';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -33,7 +33,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .wiki, 2. .google, 3. .translate, 4. .urban
+    bot.on('chat', function(data) { //TODO: 1. .wiki, 2. .google, 3. .translate, 4. .urban, 5.forecast
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -43,7 +43,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands":
-                bot.chat("List of Commands: .artist, .commands, .define, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, and .woot");
+                bot.chat("List of Commands: .artist, .commands, .define, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
                 break;
             case ".hey":
                 bot.chat("Well hey there! @"+data.from);
@@ -158,8 +158,8 @@ PlugAPI.getAuth({
                     callback: function(result) {
                         //console.log(result);
                         var tags = "";
-                        for (var index in result.tags){
-                            tags+=result.tags[index].name;
+                        for (var i=0; i<result.tags.length; i++){
+                            tags+=result.tags[i].name;
                             tags+=", ";
                         }
                         tags=tags.substring(0, tags.length-2)
@@ -208,7 +208,7 @@ PlugAPI.getAuth({
                 var linkQualifier=qualifier;
                 linkQualifier=linkQualifier.replace(/ /g, '%20');
                 dict.query(linkQualifier.toLowerCase(), function(err, result) {
-                    console.log(result);
+                    //console.log(result);
                     result=result.replace(/<vi>(.*?)<\/vi>|<dx>(.*?)<\/dx>|<dro>(.*?)<\/dro>|<uro>(.*?)<\/uro>|<svr>(.*?)<\/svr>|<sin>(.*?)<\/sin>|<set>(.*?)<\/set>|<pl>(.*?)<\/pl>|<pt>(.*?)<\/pt>|<ss>(.*?)<\/ss>|<ca>(.*?)<\/ca>|<art>(.*?)<\/art>|<ew>(.*?)<\/ew>|<hw>(.*?)<\/hw>|<sound>(.*?)<\/sound>|<pr>(.*?)<\/pr>|<fl>(.*?)<\/fl>|<date>(.*?)<\/date>|<sxn>(.*?)<\/sxn>|<ssl>(.*?)<\/ssl>/g, '');
                     result=result.replace(/<vt>(.*?)<\/vt>/g,' ');
                     result=result.replace(/<\/sx> <sx>|<sd>/g,', ');
@@ -216,7 +216,7 @@ PlugAPI.getAuth({
                     result=result.replace(/\s{1,}<un>/g, ': ');
                     result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
                     result=result.replace(/\s{1,}:/g,': ')
-                    console.log(result);
+                    //console.log(result);
                     if (result.indexOf(":") != -1 && (result.indexOf(":")<result.indexOf("1:") || result.indexOf("1:") == -1) && (result.indexOf(":")<result.indexOf("1 a") || result.indexOf("1 a") == -1)) {
                         result=result.substring(result.indexOf(":")+1);
                     }
@@ -231,7 +231,7 @@ PlugAPI.getAuth({
                     result=result.substring(0, result.indexOf("</entry>"));
                     result=result.replace(/\s{1,};/g, ';');
                     result=result.replace(/\s{1,},/g, ',');
-                    console.log(result);
+                    //console.log(result);
                     if (result != ''){
                         bot.chat(result);
                         bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
@@ -240,6 +240,7 @@ PlugAPI.getAuth({
                         bot.chat("No definition found.")
                     }
                 });
+                break;
             case ".wiki":
                 Wiki.page(qualifier, function(err, page){
                     page.summary(function(err, summary){
