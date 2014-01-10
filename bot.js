@@ -299,7 +299,6 @@ PlugAPI.getAuth({
                         if (location!=null){
                             weather.getWeather(location.lat, location.lng, function(err, data){
                                 if (data!=null){
-                                    //console.log(data);
                                     var weekForecast="Forecast for "+data.location.areaDescription+": Current: "+data.currentobservation.Temp+"°F "+data.currentobservation.Weather;
                                     for (var i=0; i<7; i++){
                                         var day = data.time.startPeriodName[i].split(' ');
