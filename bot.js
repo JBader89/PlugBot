@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'terminally-chillin';
+var ROOM = 'chillout-mixer-ambient-triphop';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -36,7 +36,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .translate, 2. .urban, 3. .google, 4. .sc, 5. .calc
+    bot.on('chat', function(data) { //TODO: 1. .calc, 2. .urban, 3. .google, 4. .sc, 5. .translate
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -65,12 +65,16 @@ PlugAPI.getAuth({
                     console.log(bot.getDJs()[0].username, bot.getDJs(), bot.getDJs()[0])
                     bot.chat("Nice play! @"+bot.getDJs()[0].username);
                     break;
+                case ".damnright":
+                    bot.chat("http://i.imgur.com/5Liksxa.gif");
+                    break;
                 case ".join":
                     bot.waitListJoin();
                     bot.chat("Joining Waitlist!");
                     break;
                 case ".leave":
                     bot.waitListLeave();
+                    bot.chat("Leaving Waitlist.");
                     break;
                 case ".skip":
                     bot.skipSong();
@@ -119,33 +123,31 @@ PlugAPI.getAuth({
                     });
                     break;
                 case ".track":
-                    if (data.from=='TerminallyChill'){
-                        lastfm.getTrackInfo({
-                            artist: bot.getMedia().author,
-                            track: bot.getMedia().title,
-                            callback: function(result) {
-                                //console.log(result);
-                                if (result.success==true){
-                                    if (result.trackInfo.wiki!=undefined){
-                                        var summary=result.trackInfo.wiki.summary;
-                                        summary=summary.replace(/(&quot;)/g, '"');
-                                        summary=summary.replace(/(&amp;)/g, '&');
-                                        summary=summary.replace(/(&eacute;)/g, 'é');
-                                        summary=summary.replace(/(&aacute;)/g, 'á');
-                                        summary=summary.replace(/(&auml;)/g, 'ä');
-                                        summary=summary.replace(/<[^>]+>/g, '');
-                                        bot.chat(summary);
-                                    }
-                                    else {
-                                        bot.chat("No track info found.")
-                                    }
+                    lastfm.getTrackInfo({
+                        artist: bot.getMedia().author,
+                        track: bot.getMedia().title,
+                        callback: function(result) {
+                            //console.log(result);
+                            if (result.success==true){
+                                if (result.trackInfo.wiki!=undefined){
+                                    var summary=result.trackInfo.wiki.summary;
+                                    summary=summary.replace(/(&quot;)/g, '"');
+                                    summary=summary.replace(/(&amp;)/g, '&');
+                                    summary=summary.replace(/(&eacute;)/g, 'é');
+                                    summary=summary.replace(/(&aacute;)/g, 'á');
+                                    summary=summary.replace(/(&auml;)/g, 'ä');
+                                    summary=summary.replace(/<[^>]+>/g, '');
+                                    bot.chat(summary);
                                 }
                                 else {
                                     bot.chat("No track info found.")
                                 }
                             }
-                        });
-                    }
+                            else {
+                                bot.chat("No track info found.")
+                            }
+                        }
+                    });
                     break;
                 case ".genre":
                     var artistChoice="";
@@ -253,13 +255,18 @@ PlugAPI.getAuth({
                         Wiki.page(qualifier, false, function(err, page){
                             page.summary(function(err, summary){
                                 if (summary!=undefined){
-                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1){
+                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
                                         bot.chat("This may refer to several things - please be more specific.");
                                     }
-                                    else if (summary.split(' ')[0].toLowerCase()=="redirect"){
+                                    else if (summary.substring(0,8).toLowerCase()=="redirect"){
                                         subQuery='';
                                         if (summary.indexOf('#')==-1){
-                                            var query=summary.substring(9);
+                                            if (summary.substring(8,9)==' '){
+                                                var query=summary.substring(9);
+                                            }
+                                            else{
+                                                var query=summary.substring(8);
+                                            }
                                             if (summary.indexOf("This is a redirect")!=-1){
                                                 query=query.substring(0, query.indexOf("This is a redirect")-1);
                                             }
