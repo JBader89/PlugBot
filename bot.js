@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'chillout-mixer-ambient-triphop';
+var ROOM = 'terminally-chillin';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -12,11 +12,10 @@ var lastfm = new Lastfm({
 });
 
 var api = require('dictionaryapi');
-
 var Wiki = require("wikijs");
-
 var google_geocoding = require('google-geocoding');
 var weather = require('weathers');
+var mlexer = require('math-lexer');
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
@@ -36,7 +35,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .calc, 2. .urban, 3. .google, 4. .sc, 5. .translate
+    bot.on('chat', function(data) { //TODO: 1. .calc, 2. .sc, 3. .translate 4. .urban, 5. .google
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -47,7 +46,7 @@ PlugAPI.getAuth({
             switch (command)
             {
                 case ".commands":
-                    bot.chat("List of Commands: .artist, .commands, .define, .forecast, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
+                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
                     break;
                 case ".hey":
                     bot.chat("Well hey there! @"+data.from);
@@ -335,6 +334,33 @@ PlugAPI.getAuth({
                             bot.chat("No weather found.")
                         }
                     });
+                    break;
+                case ".calc":
+                    var counter = 0;
+                    var counter2 = 0;
+                    for (var i=0; i<qualifier.length; i++) {
+                        if (qualifier.charAt(i)=='(') {
+                            counter++;
+                        } 
+                        else if(qualifier.charAt(i)==')') {
+                            counter2++;
+                        } 
+                    }
+                    if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\-\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\-\*\/\^]/g.test(qualifier)) && !(/([a-zA-Z])\d/g.test(qualifier)) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
+                        func=qualifier;
+                        func+=" + (0*x) + (0*y)";
+                        var realfunc=mlexer.parseString(func);
+                        var answer=(realfunc({x:0,y:0}));
+                        if (answer.toString()!="NaN"){
+                            bot.chat(answer.toString());
+                        }
+                        else{
+                            bot.chat("/me does not compute.");
+                        }
+                    }
+                    else{
+                        bot.chat("/me does not compute.");
+                    }
                     break;
             //}
         }
