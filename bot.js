@@ -35,7 +35,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .calc, 2. .sc, 3. .translate 4. .urban, 5. .google
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. .urban, 4. .google
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');

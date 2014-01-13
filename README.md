@@ -8,7 +8,7 @@ Commands
 
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.  
 .calc - Calculates the solution to a given mathematical problem with .calc [equation].  
-.commands - Returns the list of commands. 
+.commands - Returns the list of commands.   
 .define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].  
 .forecast - Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState].  
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
