@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'terminally-chillin';
+var ROOM = 'chillouttent';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -35,7 +35,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. .urban, 4. .google
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. .urban, 4. .google 5. Ellipses 6. Comments
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -46,14 +46,14 @@ PlugAPI.getAuth({
             switch (command)
             {
                 case ".commands":
-                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
+                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .github, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
                     break;
                 case ".hey":
                     bot.chat("Well hey there! @"+data.from);
                     break;
                 case ".woot":
                     bot.woot();
-                    bot.chat("This is awesome! Nice play!");
+                    bot.chat("I can dig it!");
                     break;
                 case ".meh":
                     bot.meh();
@@ -78,6 +78,9 @@ PlugAPI.getAuth({
                 case ".skip":
                     bot.skipSong();
                     bot.chat("Skipping!");
+                    break;
+                case ".github":
+                    bot.chat("Check me out on GitHub! - https://github.com/JBader89/PlugBot");
                     break;
                 case ".artist":
                     var artistChoice="";
@@ -276,15 +279,21 @@ PlugAPI.getAuth({
                                         }
                                         Wiki.page(query, false, function(err, page2){
                                             page2.content(function(err, content){
-                                                if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1){
-                                                    bot.chat("This may refer to several things - please be more specific.");
-                                                }
-                                                else if (subQuery!=''){
-                                                    content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
-                                                    bot.chat(content);
+                                                if (content!=undefined){
+                                                    console.log(content);
+                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
+                                                        bot.chat("This may refer to several things - please be more specific.");
+                                                    }
+                                                    else if (subQuery!=''){
+                                                        content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
+                                                        bot.chat(content);
+                                                    }
+                                                    else{
+                                                        bot.chat(content);
+                                                    }
                                                 }
                                                 else{
-                                                    bot.chat(content);
+                                                    bot.chat("No wiki found.");
                                                 }
                                             });
                                         });
@@ -346,7 +355,7 @@ PlugAPI.getAuth({
                             counter2++;
                         } 
                     }
-                    if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\-\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\-\*\/\^]/g.test(qualifier)) && !(/([a-zA-Z])\d/g.test(qualifier)) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
+                    if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/[\!\,\@\'\"\?\#\$\%\&\_\=\<\>\:\;\[\]\{\}\`\~\|]/g.test(qualifier)) &&  !(/\^\s{0,}\d{0,}\s{0,}\^/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\-\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\-\*\/\^]/g.test(qualifier)) && !(/([a-zA-Z])\d/g.test(qualifier)) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
                         func=qualifier;
                         func+=" + (0*x) + (0*y)";
                         var realfunc=mlexer.parseString(func);

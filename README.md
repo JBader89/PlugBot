@@ -11,7 +11,8 @@ Commands
 .commands - Returns the list of commands.   
 .define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].  
 .forecast - Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState].  
-.genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
+.genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.
+.github - Returns link to bot's GitHub repository.    
 .grab - Makes the bot grab the current song.  
 .hey - Makes the bot greet the user.  
 .join - Makes the bot join the waitlist.  
