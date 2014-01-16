@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'chillouttent';
+var ROOM = 'chillout-mixer-ambient-triphop';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -46,7 +46,7 @@ PlugAPI.getAuth({
             switch (command)
             {
                 case ".commands":
-                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .github, .grab, .hey, .join, .leave, .meh, .props, .skip, .track, .wiki, and .woot");
+                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .github, .hey, .meh, .props, .track, .wiki, and .woot");
                     break;
                 case ".hey":
                     bot.chat("Well hey there! @"+data.from);
@@ -80,7 +80,10 @@ PlugAPI.getAuth({
                     bot.chat("Skipping!");
                     break;
                 case ".github":
-                    bot.chat("Check me out on GitHub! - https://github.com/JBader89/PlugBot");
+                    bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
+                    break;
+                case ".eggsfortheprettylady":
+                    bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
                     break;
                 case ".artist":
                     var artistChoice="";
@@ -102,13 +105,21 @@ PlugAPI.getAuth({
                                     summary=summary.replace(/(&eacute;)/g, 'é');
                                     summary=summary.replace(/(&aacute;)/g, 'á');
                                     summary=summary.replace(/(&auml;)/g, 'ä');
+                                    summary=summary.replace(/(&iacute;)/g, 'í');
+                                    summary=summary.replace(/(&oacute;)/g, 'ó');
                                     summary=summary.replace(/<[^>]+>/g, '');
-                                    if (summary.indexOf("1)") != -1){
-                                        summary=summary.substring(summary.indexOf("1) ")+3);
-                                        if (summary.indexOf("2)") != -1){
-                                            summary=summary.substring(0, summary.indexOf("2)")-1);
+                                    if (summary.indexOf(" 1) ") != -1 ){
+                                        summary=summary.substring(summary.lastIndexOf(" 1) ")+4);
+                                        if (summary.indexOf(" 2) ") != -1){
+                                            summary=summary.substring(0, summary.lastIndexOf(" 2)"));
                                         }
-                                    }                                    
+                                    }   
+                                    else if (summary.indexOf(" 1. ") != -1 ){
+                                        summary=summary.substring(summary.lastIndexOf(" 1. ")+4);
+                                        if (summary.indexOf(" 2. ") != -1){
+                                            summary=summary.substring(0, summary.lastIndexOf(" 2."));
+                                        }
+                                    }                                       
                                     bot.chat(summary); 
                                     var lastfmArtist=artistChoice;
                                     lastfmArtist=lastfmArtist.replace(/ /g, '+');
