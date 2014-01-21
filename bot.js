@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); 
-var ROOM = 'chillout-mixer-ambient-triphop';
+var ROOM = 'terminally-chillin';
 var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
 
 var Lastfm = require('simple-lastfm');
@@ -23,7 +23,7 @@ PlugAPI.getAuth({
     password: 'xxx'
 }, function(err, auth) { 
     if(err) {
-        //console.log("An error occurred: " + err);
+        console.log("An error occurred: " + err);
         return;
     }
     var bot = new PlugAPI(auth, UPDATECODE);
@@ -31,11 +31,23 @@ PlugAPI.getAuth({
 
     //Event which triggers when bot joins the room
     bot.on('roomJoin', function(data) {
-        bot.sendChat("I'm live!");
+        //bot.sendChat("I'm live!");
+    });
+
+    var reconnect = function() { 
+        bot.connect(ROOM);
+    };
+
+    bot.on('close', reconnect);
+    bot.on('error', reconnect);
+
+    bot.on('djAdvance', function(data) {
+        console.log(data, bot.getUser(data.currentDJ));
+        console.log(bot.getDJs()[0].username, bot.getDJs());
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. .urban, 4. .google 5. Ellipses 6. Comments
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. album 4. .urban, 5. .google 6. Ellipses 7. Comments
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -61,7 +73,6 @@ PlugAPI.getAuth({
                     break;
                 case ".props":
                 case ".propsicle":
-                    console.log(bot.getDJs()[0].username, bot.getDJs(), bot.getDJs()[0])
                     bot.chat("Nice play! @"+bot.getDJs()[0].username);
                     break;
                 case ".damnright":
@@ -119,7 +130,13 @@ PlugAPI.getAuth({
                                         if (summary.indexOf(" 2. ") != -1){
                                             summary=summary.substring(0, summary.lastIndexOf(" 2."));
                                         }
-                                    }                                       
+                                    }     
+                                    else if (summary.indexOf(" (1) ") != -1 ){
+                                        summary=summary.substring(summary.lastIndexOf(" (1) ")+4);
+                                        if (summary.indexOf(" (2) ") != -1){
+                                            summary=summary.substring(0, summary.lastIndexOf(" (2)"));
+                                        }
+                                    }                                     
                                     bot.chat(summary); 
                                     var lastfmArtist=artistChoice;
                                     lastfmArtist=lastfmArtist.replace(/ /g, '+');
