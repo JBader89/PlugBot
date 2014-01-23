@@ -27,13 +27,14 @@ PlugAPI.getAuth({
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
+        return;
     }
     var bot = new PlugAPI(auth, UPDATECODE);
     bot.connect(ROOM);
 
     //Event which triggers when bot joins the room
     bot.on('roomJoin', function(data) {
-        //bot.sendChat("I'm live!");
+        bot.sendChat("I'm live!");
         console.log("I'm live!");
     });
 
@@ -50,7 +51,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate, 3. album, 4. .urban, 5. .google, 6. Ellipses, 7. Comments, 8. Change name, 9. Fix .wiki, 10. Fix .calc
+    bot.on('chat', function(data) { //TODO: 1. Fix .wiki , 2. Fix .translate, 3. Ellipses, 4. Comments, 5. .sc, 6. album, 7. .urban, 8. .google
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -78,32 +79,35 @@ PlugAPI.getAuth({
                 case ".propsicle":
                     bot.chat("Nice play! @"+bot.getDJs()[0].username);
                     break;
-                case ".damnright":
-                    bot.chat("http://i.imgur.com/5Liksxa.gif");
-                    break;
                 case ".join":
                     bot.waitListJoin();
-                    bot.chat("Joining Waitlist!");
+                    bot.chat("Joining waitlist!");
                     break;
                 case ".leave":
                     bot.waitListLeave();
-                    bot.chat("Leaving Waitlist.");
+                    bot.chat("Leaving waitlist.");
                     break;
                 case ".skip":
                     bot.skipSong();
                     bot.chat("Skipping!");
                     break;
-                case ".github":
-                    bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
+                case ".damnright":
+                    bot.chat("http://i.imgur.com/5Liksxa.gif");
                     break;
                 case ".eggsfortheprettylady":
                     bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
+                    break;
+                case ".github":
+                    bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
                     break;
                 case ".about":
                     bot.chat("Hey! I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
                     break;
                 case ".facebook":
                     bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
+                    break;
+                case ".pita":
+                    bot.chat("http://chillouttent.org/p-i-t-a/");
                     break;
                 case ".artist":
                     var artistChoice="";
@@ -396,7 +400,7 @@ PlugAPI.getAuth({
                             counter2++;
                         } 
                     }
-                    if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/[\!\,\@\'\"\?\#\$\%\&\_\=\<\>\:\;\[\]\{\}\`\~\|]/g.test(qualifier)) &&  !(/\^\s{0,}\d{0,}\s{0,}\^/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\-\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\-\*\/\^]/g.test(qualifier)) && !(/([a-zA-Z])\d/g.test(qualifier)) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
+                    if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/[\!\,\@\'\"\?\#\$\%\&\_\=\<\>\:\;\[\]\{\}\`\~\||log]/g.test(qualifier)) &&  !(/\^\s{0,}\d{0,}\s{0,}\^/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\-\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\-\*\/\^]/g.test(qualifier)) && (!(/([a-zA-Z])\d/g.test(qualifier))) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
                         func=qualifier;
                         func+=" + (0*x) + (0*y)";
                         var realfunc=mlexer.parseString(func);
