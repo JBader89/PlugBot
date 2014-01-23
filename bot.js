@@ -1,6 +1,6 @@
 var PlugAPI = require('./plugapi'); 
 var ROOM = 'terminally-chillin';
-var UPDATECODE = '_:8s[H@*dnPe!nNerEM';
+var UPDATECODE = 'p9R*';
 
 var Lastfm = require('simple-lastfm');
 
@@ -17,6 +17,9 @@ var google_geocoding = require('google-geocoding');
 var weather = require('weathers');
 var mlexer = require('math-lexer');
 
+var MsTranslator = require('mstranslator');
+var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="});
+
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
@@ -24,7 +27,6 @@ PlugAPI.getAuth({
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
-        return;
     }
     var bot = new PlugAPI(auth, UPDATECODE);
     bot.connect(ROOM);
@@ -32,6 +34,7 @@ PlugAPI.getAuth({
     //Event which triggers when bot joins the room
     bot.on('roomJoin', function(data) {
         //bot.sendChat("I'm live!");
+        console.log("I'm live!");
     });
 
     var reconnect = function() { 
@@ -42,12 +45,12 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     bot.on('djAdvance', function(data) {
-        console.log(data, bot.getUser(data.currentDJ));
-        console.log(bot.getDJs()[0].username, bot.getDJs());
+        //console.log(data, bot.getUser(data.currentDJ));
+        console.log(bot.getDJs()[0].username);//, bot.getDJs());
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate 3. album 4. .urban, 5. .google 6. Ellipses 7. Comments
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .translate, 3. album, 4. .urban, 5. .google, 6. Ellipses, 7. Comments, 8. Change name, 9. Fix .wiki, 10. Fix .calc
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -58,7 +61,7 @@ PlugAPI.getAuth({
             switch (command)
             {
                 case ".commands":
-                    bot.chat("List of Commands: .artist, .calc, .commands, .damnright, .define, .forecast, .genre, .github, .hey, .meh, .props, .track, .wiki, and .woot");
+                    bot.chat("List of Commands: .about, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .github, .hey, .meh, .props, .track, .translate, .wiki, and .woot");
                     break;
                 case ".hey":
                     bot.chat("Well hey there! @"+data.from);
@@ -95,6 +98,12 @@ PlugAPI.getAuth({
                     break;
                 case ".eggsfortheprettylady":
                     bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
+                    break;
+                case ".about":
+                    bot.chat("Hey! I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
+                    break;
+                case ".facebook":
+                    bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
                     break;
                 case ".artist":
                     var artistChoice="";
@@ -285,6 +294,7 @@ PlugAPI.getAuth({
                         Wiki.page(qualifier, false, function(err, page){
                             page.summary(function(err, summary){
                                 if (summary!=undefined){
+                                    console.log(summary);
                                     if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
                                         bot.chat("This may refer to several things - please be more specific.");
                                     }
@@ -335,6 +345,9 @@ PlugAPI.getAuth({
                                 }    
                             });
                         });
+                    }
+                    else{
+                        bot.chat("Try .wiki followed by something to look up.");
                     }
                     break;
                 case ".forecast":
@@ -399,6 +412,34 @@ PlugAPI.getAuth({
                         bot.chat("/me does not compute.");
                     }
                     break;
+                case ".translate":
+                    if (qualifier!=""){
+                        var params = { 
+                            text: qualifier 
+                        };
+                        var language="";
+                        client.initialize_token(function(keys){ 
+                            client.detect(params, function(err, data) {
+                                console.log(data);
+                                language = data;
+                            });
+                            var params2 = { 
+                                text: qualifier,
+                                from: language,
+                                to: 'en'
+                            };
+                            client.initialize_token(function(keys){ 
+                                client.translate(params2, function(err, data) {
+                                    console.log(params2.text+" "+language+" "+data);
+                                    bot.chat(data);
+                                });
+                            });
+                        });
+                    }
+                    else{
+                        bot.chat("Try .translate followed by something to translate.");
+                    }
+                    break;    
             //}
         }
     });
