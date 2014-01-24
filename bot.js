@@ -51,7 +51,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. Fix .translate, 2. Ellipses, 3. Comments, 4. .sc, 5. album, 6. .urban, 7. .google
+    bot.on('chat', function(data) { //TODO: 1. Fix .translate, 2. Comments, 3. .sc, 4. album, 5. .urban, 6. .google
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
@@ -132,24 +132,27 @@ PlugAPI.getAuth({
                                     summary=summary.replace(/(&iacute;)/g, 'í');
                                     summary=summary.replace(/(&oacute;)/g, 'ó');
                                     summary=summary.replace(/<[^>]+>/g, '');
-                                    if (summary.indexOf(" 1) ") != -1 ){
+                                    if (summary.indexOf(" 1) ") != -1){
                                         summary=summary.substring(summary.lastIndexOf(" 1) ")+4);
                                         if (summary.indexOf(" 2) ") != -1){
                                             summary=summary.substring(0, summary.lastIndexOf(" 2)"));
                                         }
                                     }   
-                                    else if (summary.indexOf(" 1. ") != -1 ){
+                                    else if (summary.indexOf(" 1. ") != -1){
                                         summary=summary.substring(summary.lastIndexOf(" 1. ")+4);
                                         if (summary.indexOf(" 2. ") != -1){
                                             summary=summary.substring(0, summary.lastIndexOf(" 2."));
                                         }
                                     }     
-                                    else if (summary.indexOf(" (1) ") != -1 ){
+                                    else if (summary.indexOf(" (1) ") != -1){
                                         summary=summary.substring(summary.lastIndexOf(" (1) ")+4);
                                         if (summary.indexOf(" (2) ") != -1){
                                             summary=summary.substring(0, summary.lastIndexOf(" (2)"));
                                         }
-                                    }                                     
+                                    }        
+                                    if (summary.length>250){
+                                        summary=summary.substring(0, 247)+"...";
+                                    }                           
                                     bot.chat(summary); 
                                     var lastfmArtist=artistChoice;
                                     lastfmArtist=lastfmArtist.replace(/ /g, '+');
@@ -180,6 +183,9 @@ PlugAPI.getAuth({
                                     summary=summary.replace(/(&aacute;)/g, 'á');
                                     summary=summary.replace(/(&auml;)/g, 'ä');
                                     summary=summary.replace(/<[^>]+>/g, '');
+                                    if (summary.length>250){
+                                        summary=summary.substring(0, 247)+"...";
+                                    }  
                                     bot.chat(summary);
                                 }
                                 else {
@@ -260,7 +266,6 @@ PlugAPI.getAuth({
                     var linkQualifier=qualifier;
                     linkQualifier=linkQualifier.replace(/ /g, '%20');
                     dict.query(linkQualifier.toLowerCase(), function(err, result) {
-                        //console.log(result);
                         result=result.replace(/<vi>(.*?)<\/vi>|<dx>(.*?)<\/dx>|<dro>(.*?)<\/dro>|<uro>(.*?)<\/uro>|<svr>(.*?)<\/svr>|<sin>(.*?)<\/sin>|<set>(.*?)<\/set>|<pl>(.*?)<\/pl>|<pt>(.*?)<\/pt>|<ss>(.*?)<\/ss>|<ca>(.*?)<\/ca>|<art>(.*?)<\/art>|<ew>(.*?)<\/ew>|<hw>(.*?)<\/hw>|<sound>(.*?)<\/sound>|<pr>(.*?)<\/pr>|<fl>(.*?)<\/fl>|<date>(.*?)<\/date>|<sxn>(.*?)<\/sxn>|<ssl>(.*?)<\/ssl>/g, '');
                         result=result.replace(/<vt>(.*?)<\/vt>/g,' ');
                         result=result.replace(/<\/sx> <sx>|<sd>/g,', ');
@@ -268,7 +273,6 @@ PlugAPI.getAuth({
                         result=result.replace(/\s{1,}<un>/g, ': ');
                         result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
                         result=result.replace(/\s{1,}:/g,': ')
-                        //console.log(result);
                         if (result.indexOf(":") != -1 && (result.indexOf(":")<result.indexOf("1:") || result.indexOf("1:") == -1) && (result.indexOf(":")<result.indexOf("1 a") || result.indexOf("1 a") == -1)) {
                             result=result.substring(result.indexOf(":")+1);
                         }
@@ -283,8 +287,10 @@ PlugAPI.getAuth({
                         result=result.substring(0, result.indexOf("</entry>"));
                         result=result.replace(/\s{1,};/g, ';');
                         result=result.replace(/\s{1,},/g, ',');
-                        //console.log(result);
                         if (result != ''){
+                            if (result.length>250){
+                                result=result.substring(0, 247)+"...";
+                            }  
                             bot.chat(result);
                             //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                         }
@@ -335,9 +341,15 @@ PlugAPI.getAuth({
                                                                         }
                                                                         else if (subQuery!=''){
                                                                             content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
+                                                                            if (content.length>250){
+                                                                                content=content.substring(0, 247)+"...";
+                                                                            }  
                                                                             bot.chat(content);
                                                                         }
                                                                         else{
+                                                                            if (content.length>250){
+                                                                                content=content.substring(0, 247)+"...";
+                                                                            }  
                                                                             bot.chat(content);
                                                                         }
                                                                     }
@@ -348,6 +360,9 @@ PlugAPI.getAuth({
                                                             });
                                                         }
                                                         else{
+                                                            if (summary.length>250){
+                                                                summary=summary.substring(0, 247)+"...";
+                                                            }  
                                                             bot.chat(summary);
                                                         }
                                                     }
