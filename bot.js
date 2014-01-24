@@ -8,7 +8,7 @@ var lastfm = new Lastfm({
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 });
 
 var api = require('dictionaryapi');
@@ -23,7 +23,7 @@ var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW1
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -101,7 +101,7 @@ PlugAPI.getAuth({
                     bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
                     break;
                 case ".about":
-                    bot.chat("Hey! I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
+                    bot.chat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
                     break;
                 case ".facebook":
                     bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
@@ -298,55 +298,70 @@ PlugAPI.getAuth({
                         Wiki.page(qualifier, false, function(err, page){
                             page.summary(function(err, summary){
                                 if (summary!=undefined){
-                                    console.log(summary);
-                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
-                                        bot.chat("This may refer to several things - please be more specific.");
-                                    }
-                                    else if (summary.substring(0,8).toLowerCase()=="redirect"){
-                                        subQuery='';
-                                        if (summary.indexOf('#')==-1){
-                                            if (summary.substring(8,9)==' '){
-                                                var query=summary.substring(9);
+                                    Wiki.page(qualifier, false, function(err, page){
+                                        page.html(function(err, html){
+                                            if (html.indexOf('<ul>')!=-1){
+                                                html=html.substring(0, html.indexOf('<ul>'));
                                             }
-                                            else{
-                                                var query=summary.substring(8);
-                                            }
-                                            if (summary.indexOf("This is a redirect")!=-1){
-                                                query=query.substring(0, query.indexOf("This is a redirect")-1);
-                                            }
-                                        }
-                                        else{
-                                            var query=summary.substring(9, summary.indexOf('#'));
-                                            subQuery=summary.substring(summary.indexOf('#')+1);
-                                        }
-                                        Wiki.page(query, false, function(err, page2){
-                                            page2.content(function(err, content){
-                                                if (content!=undefined){
-                                                    console.log(content);
-                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
-                                                        bot.chat("This may refer to several things - please be more specific.");
-                                                    }
-                                                    else if (subQuery!=''){
-                                                        content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
-                                                        bot.chat(content);
+                                            html=html.replace(/<[^>]+>/g, '');
+                                            Wiki.page(qualifier, false, function(err, page){
+                                                page.summary(function(err, summary){
+                                                    if (summary!=undefined){
+                                                        if (summary=="" || summary.indexOf("This is a redirect")!=-1){
+                                                            summary="redirect "+html;
+                                                        }
+                                                        if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
+                                                            bot.chat("This may refer to several things - please be more specific.");
+                                                        }
+                                                        else if (summary.substring(0,8).toLowerCase()=="redirect"){
+                                                            subQuery='';
+                                                            if (summary.indexOf('#')==-1){
+                                                                if (summary.substring(8,9)==' '){
+                                                                    var query=summary.substring(9);
+                                                                }
+                                                                else{
+                                                                    var query=summary.substring(8);
+                                                                }
+                                                            }
+                                                            else{
+                                                                var query=summary.substring(9, summary.indexOf('#'));
+                                                                subQuery=summary.substring(summary.indexOf('#')+1);
+                                                            }
+                                                            Wiki.page(query, false, function(err, page2){
+                                                                page2.content(function(err, content){
+                                                                    if (content!=undefined){
+                                                                        if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
+                                                                            bot.chat("This may refer to several things - please be more specific.");
+                                                                        }
+                                                                        else if (subQuery!=''){
+                                                                            content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
+                                                                            bot.chat(content);
+                                                                        }
+                                                                        else{
+                                                                            bot.chat(content);
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        bot.chat("No wiki found.");
+                                                                    }
+                                                                });
+                                                            });
+                                                        }
+                                                        else{
+                                                            bot.chat(summary);
+                                                        }
                                                     }
                                                     else{
-                                                        bot.chat(content);
-                                                    }
-                                                }
-                                                else{
-                                                    bot.chat("No wiki found.");
-                                                }
+                                                        bot.chat("No wiki found.");
+                                                    }    
+                                                });
                                             });
                                         });
-                                    }
-                                    else{
-                                        bot.chat(summary);
-                                    }
+                                    });
                                 }
                                 else{
                                     bot.chat("No wiki found.");
-                                }    
+                                } 
                             });
                         });
                     }
