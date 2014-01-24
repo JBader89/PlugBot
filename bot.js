@@ -8,7 +8,7 @@ var lastfm = new Lastfm({
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var api = require('dictionaryapi');
@@ -23,7 +23,7 @@ var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW1
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -51,7 +51,7 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. Fix .wiki , 2. Fix .translate, 3. Ellipses, 4. Comments, 5. .sc, 6. album, 7. .urban, 8. .google
+    bot.on('chat', function(data) { //TODO: 1. Fix .translate, 2. Ellipses, 3. Comments, 4. .sc, 5. album, 6. .urban, 7. .google
         //if (data.from=='TerminallyChill'){
             var command=data.message.split(' ')[0];
             var firstIndex=data.message.indexOf(' ');
