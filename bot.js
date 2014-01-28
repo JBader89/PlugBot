@@ -34,7 +34,7 @@ PlugAPI.getAuth({
 
     //Event which triggers when bot joins the room
     bot.on('roomJoin', function(data) {
-        bot.sendChat("I'm live!");
+        //bot.sendChat("I'm live!");
         console.log("I'm live!");
     });
 
@@ -247,7 +247,7 @@ PlugAPI.getAuth({
                                 if (playlists[i].selected){
                                     if (playlists[i].items.length!=200){
                                         var selectedID=playlists[i].id;
-                                        bot.chat("Added to "+playlists[i].name+" playlist.");
+                                        bot.chat("Added to my "+playlists[i].name+" playlist.");
                                     }
                                     else{
                                         bot.createPlaylist("Library "+playlists.length+1);
@@ -318,6 +318,9 @@ PlugAPI.getAuth({
                                                         }
                                                         if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
                                                             bot.chat("This may refer to several things - please be more specific.");
+                                                            var queryChoice=qualifier;
+                                                            queryChoice=queryChoice.replace(/ /g, '_');
+                                                            bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                         }
                                                         else if (summary.substring(0,8).toLowerCase()=="redirect"){
                                                             subQuery='';
@@ -352,6 +355,9 @@ PlugAPI.getAuth({
                                                                             }  
                                                                             bot.chat(content);
                                                                         }
+                                                                        var queryChoice=qualifier;
+                                                                        queryChoice=queryChoice.replace(/ /g, '_');
+                                                                        bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                                     }
                                                                     else{
                                                                         bot.chat("No wiki found.");
@@ -364,6 +370,9 @@ PlugAPI.getAuth({
                                                                 summary=summary.substring(0, 247)+"...";
                                                             }  
                                                             bot.chat(summary);
+                                                            var queryChoice=qualifier;
+                                                            queryChoice=queryChoice.replace(/ /g, '_');
+                                                            bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                         }
                                                     }
                                                     else{
