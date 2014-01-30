@@ -46,8 +46,8 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     bot.on('djAdvance', function(data) {
-        //console.log(data, bot.getUser(data.currentDJ));
-        console.log(bot.getDJs()[0].username);//, bot.getDJs());
+        console.log(data, bot.getUser(data.currentDJ));
+        console.log(bot.getDJs()[0].username, bot.getDJs());
     });
 
     //Event which triggers when anyone chats
@@ -87,7 +87,7 @@ PlugAPI.getAuth({
                     bot.waitListLeave();
                     bot.chat("Leaving waitlist.");
                     break;
-                case ".skip":
+                case ".skip": //Seems broken
                     bot.skipSong();
                     bot.chat("Skipping!");
                     break;
@@ -451,11 +451,16 @@ PlugAPI.getAuth({
                             bot.chat("/me does not compute.");
                         }
                     }
+                    else if (qualifier==""){
+                        bot.chat("Try .calc followed by something to calculate.");
+                    }
                     else{
                         bot.chat("/me does not compute.");
                     }
                     break;
                 case ".translate":
+                    var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
+                    var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
                     if (qualifier!=""){
                         var params = { 
                             text: qualifier 
@@ -464,18 +469,46 @@ PlugAPI.getAuth({
                         client.initialize_token(function(keys){ 
                             client.detect(params, function(err, data) {
                                 console.log(data);
-                                language = data;
-                            });
-                            var params2 = { 
-                                text: qualifier,
-                                from: language,
-                                to: 'en'
-                            };
-                            client.initialize_token(function(keys){ 
-                                client.translate(params2, function(err, data) {
-                                    console.log(params2.text+" "+language+" "+data);
-                                    bot.chat(data);
-                                });
+                                var language = data;
+                                if (languageCodes.indexOf(language) > -1){
+                                    if (qualifier.indexOf('(')==-1){
+                                        var params2 = { 
+                                            text: qualifier,
+                                            from: language,
+                                            to: 'en'
+                                        };
+                                        client.initialize_token(function(keys){ 
+                                            client.translate(params2, function(err, data) {
+                                                console.log(params2.text+" "+language+" "+data);
+                                                bot.chat(data + " (" + languages[languageCodes.indexOf(language)] + ")");
+                                            });
+                                        });
+                                    }
+                                    else{
+                                        var language2 = qualifier.substring(qualifier.indexOf('(')+1, qualifier.indexOf(')')).toLowerCase();
+                                        language2 = language2.charAt(0).toUpperCase() + language2.slice(1);
+                                        if (languages.indexOf(language2) > -1){    
+                                            var params2 = { 
+                                                text: qualifier,
+                                                from: language,
+                                                to: languageCodes[languages.indexOf(language2)]
+                                            };
+                                            client.initialize_token(function(keys){ 
+                                                client.translate(params2, function(err, data) {
+                                                    console.log(params2.text+" "+language+" "+data);
+                                                    data = data.substring(0, data.indexOf('('));
+                                                    bot.chat(data);
+                                                });
+                                            });
+                                        }
+                                        else{
+                                            bot.chat("Sorry, I don't speak that language.");
+                                        }
+                                    }
+                                }
+                                else{
+                                    bot.chat("Sorry, I don't speak that language.");
+                                }
                             });
                         });
                     }

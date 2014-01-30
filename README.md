@@ -23,5 +23,6 @@ Commands
 .props - Makes the bot give props to the user.   
 .skip - Makes the bot skip the current song.  
 .track - Returns Last.fm info about the current song.  
+.translate - Returns a translation of given words into English, or other languages with .translate [sentence] ([language])  
 .wiki - Returns Wikipedia article summary of a given query with .define [givenWord].  
 .woot - Makes the bot cast an upvote.  
