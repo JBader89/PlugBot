@@ -1,28 +1,28 @@
-var PlugAPI = require('./plugapi'); 
-var ROOM = 'chillout-mixer-ambient-triphop';
+var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
+var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name here
 var UPDATECODE = 'p9R*';
 
-var Lastfm = require('simple-lastfm');
+var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
 
-var lastfm = new Lastfm({
-    api_key: 'd657909b19fde5ac1491b756b6869d38',
-    api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
-    username: 'BaderBombs',
+var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
+    api_key: 'xxx',
+    api_secret: 'xxx',
+    username: 'xxx',
     password: 'xxx'
 });
 
-var api = require('dictionaryapi');
-var Wiki = require("wikijs");
-var google_geocoding = require('google-geocoding');
-var weather = require('weathers');
-var mlexer = require('math-lexer');
+var api = require('dictionaryapi'); //Use 'npm install dictionaryapi'
+var Wiki = require("wikijs"); //Use 'npm install wikijs'
+var google_geocoding = require('google-geocoding'); //Use 'npm install google-geocoding'
+var weather = require('weathers'); //Use 'npm install weathers'
+var mlexer = require('math-lexer'); //Use 'npm install math-lexer'
 
-var MsTranslator = require('mstranslator');
-var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="});
+var MsTranslator = require('mstranslator'); //Use 'npm install mstranslator'
+var client = new MsTranslator({client_id:"xxx", client_secret: "xxx"}); //Get own Microsoft Translator account with client_id and client_secret
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
-    username: 'BaderBombs',
+    username: 'xxx',
     password: 'xxx'
 }, function(err, auth) { 
     if(err) {
@@ -32,11 +32,12 @@ PlugAPI.getAuth({
     var bot = new PlugAPI(auth, UPDATECODE);
     bot.connect(ROOM);
 
-    //Event which triggers when bot joins the room
+    //Event which triggers when the bot joins the room
     bot.on('roomJoin', function(data) {
         console.log("I'm live!");
     });
 
+    //Events which trigger to reconnect the bot when an error occurs
     var reconnect = function() { 
         bot.connect(ROOM);
     };
@@ -54,55 +55,55 @@ PlugAPI.getAuth({
         }
         switch (command)
         {
-            case ".commands":
+            case ".commands": //Returns the list of commands
                 bot.chat("List of Commands: .about, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .github, .hey, .meh, .props, .track, .translate, .wiki, and .woot");
                 break;
-            case ".hey":
+            case ".hey": //Makes the bot greet the user 
                 bot.chat("Well hey there! @"+data.from);
                 break;
-            case ".woot":
+            case ".woot": //Makes the bot cast an upvote
                 bot.woot();
                 bot.chat("I can dig it!");
                 break;
-            case ".meh":
+            case ".meh": //Makes the bot cast a downvote
                 bot.meh();
                 bot.chat("Please... make it stop :unamused:");
                 break;
-            case ".props":
+            case ".props": //Makes the bot give props to the user
             case ".propsicle":
                 bot.chat("Nice play! @"+bot.getDJs()[0].username);
                 break;
-            case ".join":
+            case ".join": //Makes the bot join the waitlist
                 bot.waitListJoin();
                 bot.chat("Joining waitlist!");
                 break;
-            case ".leave":
+            case ".leave": //Makes the bot leave the waitlist
                 bot.waitListLeave();
                 bot.chat("Leaving waitlist.");
                 break;
-            case ".skip": //Seems broken
+            case ".skip": //Makes the bot skip the current song
                 bot.skipSong();
                 bot.chat("Skipping!");
                 break;
-            case ".damnright":
+            case ".github": //Returns a link to the bot's GitHub repository
+                bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
+                break;
+            case ".about": //Returns a description of the bot's purpose, creator, and usability
+                bot.chat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
+                break;
+            case ".facebook": //Returns a link to the Chillout Mixer Facebook page
+                bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
+                break;
+            case ".damnright": //Commands just for fun
                 bot.chat("http://i.imgur.com/5Liksxa.gif");
                 break;
             case ".eggsfortheprettylady":
                 bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
                 break;
-            case ".github":
-                bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
-                break;
-            case ".about":
-                bot.chat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
-                break;
-            case ".facebook":
-                bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
-                break;
             case ".pita":
                 bot.chat("http://chillouttent.org/p-i-t-a/");
                 break;
-            case ".artist":
+            case ".artist": //Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist
                 var artistChoice="";
                 if (qualifier==""){
                     artistChoice=bot.getMedia().author;
@@ -160,7 +161,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".track":
+            case ".track": //Returns Last.fm info about the current song
                 lastfm.getTrackInfo({
                     artist: bot.getMedia().author,
                     track: bot.getMedia().title,
@@ -189,7 +190,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".genre":
+            case ".genre": //Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist
                 var artistChoice="";
                 if (qualifier==""){
                     artistChoice=bot.getMedia().author;
@@ -230,28 +231,26 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".grab":
-                if (data.from=='TerminallyChill'){
-                    bot.getPlaylists(function(playlists) {
-                        for (var i=0; i<playlists.length; i++){
-                            if (playlists[i].selected){
-                                if (playlists[i].items.length!=200){
-                                    var selectedID=playlists[i].id;
-                                    bot.chat("Added to my "+playlists[i].name+" playlist.");
-                                }
-                                else{
-                                    bot.createPlaylist("Library "+playlists.length+1);
-                                    bot.activatePlaylist(playlists[playlists.length-1].id)
-                                    var selectedID=playlists[playlists.length-1].id;
-                                    bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
-                                }
+            case ".grab": //Makes the bot grab the current song
+                bot.getPlaylists(function(playlists) {
+                    for (var i=0; i<playlists.length; i++){
+                        if (playlists[i].selected){
+                            if (playlists[i].items.length!=200){
+                                var selectedID=playlists[i].id;
+                                bot.chat("Added to my "+playlists[i].name+" playlist.");
+                            }
+                            else{
+                                bot.createPlaylist("Library "+playlists.length+1);
+                                bot.activatePlaylist(playlists[playlists.length-1].id)
+                                var selectedID=playlists[playlists.length-1].id;
+                                bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
                             }
                         }
-                        bot.addSongToPlaylist(selectedID, bot.getMedia().id);
-                    });
-                }
+                    }
+                    bot.addSongToPlaylist(selectedID, bot.getMedia().id);
+                });
                 break;
-            case ".define":
+            case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
                 var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
                 var linkQualifier=qualifier;
                 linkQualifier=linkQualifier.replace(/ /g, '%20');
@@ -289,7 +288,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".wiki":
+            case ".wiki": //Returns Wikipedia article summary of a given query with .define [givenWord]
                 if (qualifier!=""){
                     Wiki.page(qualifier, false, function(err, page){
                         page.summary(function(err, summary){
@@ -383,7 +382,7 @@ PlugAPI.getAuth({
                     bot.chat("Try .wiki followed by something to look up.");
                 }
                 break;
-            case ".forecast":
+            case ".forecast": //Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState]
                 google_geocoding.geocode(qualifier, function(err, location) {
                     if (location!=null){
                         weather.getWeather(location.lat, location.lng, function(err, data){
@@ -418,7 +417,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".calc":
+            case ".calc": //Calculates the solution to a given mathematical problem with .calc [equation]
                 var counter = 0;
                 var counter2 = 0;
                 for (var i=0; i<qualifier.length; i++) {
@@ -448,7 +447,7 @@ PlugAPI.getAuth({
                     bot.chat("/me does not compute.");
                 }
                 break;
-            case ".translate":
+            case ".translate": //Returns a translation of given words with .translate [givenWords] '([language])', English by default
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
                 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
                 if (qualifier!=""){
