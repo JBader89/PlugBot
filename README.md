@@ -15,6 +15,7 @@ Commands
 .forecast - Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState].  
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
 .github - Returns a link to the bot's GitHub repository.  
+.google - Returns a lmgtfy (google) link with .google [givenWord].    
 .grab - Makes the bot grab the current song.  
 .hey - Makes the bot greet the user.  
 .join - Makes the bot join the waitlist.  

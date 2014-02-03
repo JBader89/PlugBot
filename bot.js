@@ -1,13 +1,13 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name here
+var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
 var UPDATECODE = 'p9R*';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
 
 var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
-    api_key: 'xxx',
-    api_secret: 'xxx',
-    username: 'xxx',
+    api_key: 'd657909b19fde5ac1491b756b6869d38',
+    api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
+    username: 'BaderBombs',
     password: 'xxx'
 });
 
@@ -18,11 +18,11 @@ var weather = require('weathers'); //Use 'npm install weathers'
 var mlexer = require('math-lexer'); //Use 'npm install math-lexer'
 
 var MsTranslator = require('mstranslator'); //Use 'npm install mstranslator'
-var client = new MsTranslator({client_id:"xxx", client_secret: "xxx"}); //Get own Microsoft Translator account with client_id and client_secret
+var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="}); //Get own Microsoft Translator account with client_id and client_secret
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
-    username: 'xxx',
+    username: 'BaderBombs',
     password: 'xxx'
 }, function(err, auth) { 
     if(err) {
@@ -46,7 +46,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. album, 3. .urban, 4. .google
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. album, 3. .urban
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -56,7 +56,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns the list of commands
-                bot.chat("List of Commands: .about, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .github, .hey, .meh, .props, .track, .translate, .wiki, and .woot");
+                bot.chat("List of Commands: .about, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .google, .github, .hey, .meh, .props, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
                 bot.chat("Well hey there! @"+data.from);
@@ -232,23 +232,25 @@ PlugAPI.getAuth({
                 });
                 break;
             case ".grab": //Makes the bot grab the current song
-                bot.getPlaylists(function(playlists) {
-                    for (var i=0; i<playlists.length; i++){
-                        if (playlists[i].selected){
-                            if (playlists[i].items.length!=200){
-                                var selectedID=playlists[i].id;
-                                bot.chat("Added to my "+playlists[i].name+" playlist.");
-                            }
-                            else{
-                                bot.createPlaylist("Library "+playlists.length+1);
-                                bot.activatePlaylist(playlists[playlists.length-1].id)
-                                var selectedID=playlists[playlists.length-1].id;
-                                bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                if (data.from=='TerminallyChill'){
+                    bot.getPlaylists(function(playlists) {
+                        for (var i=0; i<playlists.length; i++){
+                            if (playlists[i].selected){
+                                if (playlists[i].items.length!=200){
+                                    var selectedID=playlists[i].id;
+                                    bot.chat("Added to my "+playlists[i].name+" playlist.");
+                                }
+                                else{
+                                    bot.createPlaylist("Library "+playlists.length+1);
+                                    bot.activatePlaylist(playlists[playlists.length-1].id)
+                                    var selectedID=playlists[playlists.length-1].id;
+                                    bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                                }
                             }
                         }
-                    }
-                    bot.addSongToPlaylist(selectedID, bot.getMedia().id);
-                });
+                        bot.addSongToPlaylist(selectedID, bot.getMedia().id);
+                    });
+                }
                 break;
             case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
                 var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
@@ -281,7 +283,7 @@ PlugAPI.getAuth({
                             result=result.substring(0, 247)+"...";
                         }  
                         bot.chat(result);
-                        //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
+                        bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                     }
                     else{
                         bot.chat("No definition found.")
@@ -500,6 +502,16 @@ PlugAPI.getAuth({
                 }
                 else{
                     bot.chat("Try .translate followed by something to translate.");
+                }
+                break
+            case ".google": //Returns a lmgtfy (google) link with .google [givenWord]
+                if (qualifier!=""){
+                    var google=qualifier;
+                    google=google.replace(/ /g, '+');
+                    bot.chat("http://lmgtfy.com/?q=" + google);
+                }
+                else{
+                    bot.chat("Try .google followed by something to look up.");
                 }
                 break;    
         }
