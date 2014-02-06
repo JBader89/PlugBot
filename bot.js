@@ -20,6 +20,7 @@ var mlexer = require('math-lexer'); //Use 'npm install math-lexer'
 var MsTranslator = require('mstranslator'); //Use 'npm install mstranslator'
 var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="}); //Get own Microsoft Translator account with client_id and client_secret
 
+var translateList = [];
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
@@ -46,7 +47,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. album, 3. .urban
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .album, 3. .similar, 4. .urban, 5. update .wiki
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -307,7 +308,7 @@ PlugAPI.getAuth({
                                                     if (summary=="" || summary.indexOf("This is a redirect")!=-1){
                                                         summary="redirect "+html;
                                                     }
-                                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
+                                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1 || summary.indexOf('may stand for:')!=-1){
                                                         bot.chat("This may refer to several things - please be more specific.");
                                                         var queryChoice=qualifier;
                                                         queryChoice=queryChoice.replace(/ /g, '_');
@@ -330,7 +331,7 @@ PlugAPI.getAuth({
                                                         Wiki.page(query, false, function(err, page2){
                                                             page2.content(function(err, content){
                                                                 if (content!=undefined){
-                                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1){
+                                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || content.indexOf('may refer to the following:')!=-1 || content.indexOf('may stand for:')!=-1){
                                                                         bot.chat("This may refer to several things - please be more specific.");
                                                                     }
                                                                     else if (subQuery!=''){
@@ -474,7 +475,7 @@ PlugAPI.getAuth({
                                     });
                                 }
                                 else{
-                                    var language2 = qualifier.substring(qualifier.lastIndexOf('(')+1, qualifier.lastIndexOf(')')).toLowerCase();
+                                    var language2 = qualifier.substring(qualifier.indexOf('(')+1, qualifier.lastIndexOf(')')).toLowerCase();
                                     language2 = language2.charAt(0).toUpperCase() + language2.slice(1);
                                     if (languages.indexOf(language2) > -1){    
                                         var params2 = { 
@@ -484,7 +485,7 @@ PlugAPI.getAuth({
                                         };
                                         client.initialize_token(function(keys){ 
                                             client.translate(params2, function(err, data) {
-                                                data = data.substring(0, data.lastIndexOf('('));
+                                                data = data.substring(0, data.indexOf('('));
                                                 bot.chat(data);
                                             });
                                         });
@@ -504,6 +505,26 @@ PlugAPI.getAuth({
                     bot.chat("Try .translate followed by something to translate.");
                 }
                 break
+            case '.autotranslate': //Autotranslate a given user with .autotranslate [givenUser]
+                if (qualifier!=""){
+                    translateList.push(qualifier);
+                    bot.chat("Autotranslating user " + qualifier + ".");
+                }
+                else{
+                    bot.chat("Try .autotranslate followed by a username.");
+                }
+                break;
+            case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
+                if (qualifier!=""){
+                    if (translateList.indexOf(qualifier) != -1) {
+                        array.splice(translateList.indexOf(qualifier), 1);
+                    }
+                    bot.chat("Stopped autotranslating user " + qualifier + ".");
+                }
+                else{
+                    bot.chat("Try .untranslate followed by a username.");
+                }
+                break;
             case ".google": //Returns a lmgtfy (google) link with .google [givenWord]
                 if (qualifier!=""){
                     var google=qualifier;
@@ -514,6 +535,35 @@ PlugAPI.getAuth({
                     bot.chat("Try .google followed by something to look up.");
                 }
                 break;    
+            default: //Checks for users that are set to be autotranslated whenever they chat
+                if (translateList.indexOf(data.from)!=-1){
+                    var user = data.from;
+                    var message = data.message;
+                    var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
+                    var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
+                    var params = { 
+                        text: message 
+                    };
+                    var language="";
+                    client.initialize_token(function(keys){ 
+                        client.detect(params, function(err, data) {
+                            var language = data;
+                            if (languageCodes.indexOf(language) > -1 && language != 'en'){
+                                var params2 = { 
+                                    text: message,
+                                    from: language,
+                                    to: 'en'
+                                };
+                                client.initialize_token(function(keys){ 
+                                    client.translate(params2, function(err, data) {
+                                        bot.chat(user + ": " + data + " (" + languages[languageCodes.indexOf(language)] + ")");
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
+                break;
         }
     });
 });
