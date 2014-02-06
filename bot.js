@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+var ROOM = 'terminally-chillin'; //Enter your room name
 var UPDATECODE = 'p9R*';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -517,7 +517,7 @@ PlugAPI.getAuth({
             case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
                 if (qualifier!=""){
                     if (translateList.indexOf(qualifier) != -1) {
-                        array.splice(translateList.indexOf(qualifier), 1);
+                        translateList.splice(translateList.indexOf(qualifier), 1);
                     }
                     bot.chat("Stopped autotranslating user " + qualifier + ".");
                 }
