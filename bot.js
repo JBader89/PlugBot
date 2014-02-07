@@ -8,8 +8,21 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 });
+
+var LastfmAPI = require('lastfmapi');
+
+var lfm = new LastfmAPI({
+    'api_key' : 'd657909b19fde5ac1491b756b6869d38',
+    'secret' : '571e2972ae56bd9c1c6408f13696f1f3'
+});
+
+// lfm.artist.getEvents({
+//     'artist' : 'Zero 7'
+// }, function (err, events) {
+//     console.log(events);
+// });
 
 var api = require('dictionaryapi'); //Use 'npm install dictionaryapi'
 var Wiki = require("wikijs"); //Use 'npm install wikijs'
@@ -24,7 +37,7 @@ var translateList = [];
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -47,7 +60,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .album, 3. .similar, 4. .urban, 5. update .wiki
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .similar, 3. .urban, 4. update .wiki, 5. .events
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -218,7 +231,7 @@ PlugAPI.getAuth({
                                 bot.chat("Genre of "+trackChoice+" by "+artistChoice+": "+tags);
                             }
                             else{
-                                bot.chat("No genre found.")
+                                bot.chat("No genre found.");
                             }
                         }
                         else{
@@ -226,9 +239,48 @@ PlugAPI.getAuth({
                                 bot.chat("Genre of "+artistChoice+": "+tags);
                             }
                             else{
-                                bot.chat("No genre found.")
+                                bot.chat("No genre found.");
                             }
                         }
+                    }
+                });
+                break;
+            case ".album": //Returns the album of the current song
+                lfm.track.getInfo({
+                    'artist' : bot.getMedia().author,
+                    'track' : bot.getMedia().title
+                }, function (err, track) {
+                    if (track!=undefined){
+                        bot.chat(track.name + " is from the album " + track.album.title + ".");
+                        bot.chat("Check out the full album: " + track.album.url);
+                    }
+                    else{
+                        bot.chat("No album found.")
+                    }
+                });
+                break;
+            case ".similar": //Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist
+                var artistChoice="";
+                if (qualifier==""){
+                    artistChoice=bot.getMedia().author;
+                }
+                else{
+                    artistChoice=qualifier;
+                }
+                lfm.artist.getSimilar({
+                    'limit' : 7,
+                    'artist' : artistChoice
+                }, function (err, similarArtists) {
+                    if (similarArtists!=undefined){
+                        var artists = '';
+                        for (var i=0; i<similarArtists.artist.length; i++){
+                            artists = artists + similarArtists.artist[i].name + ", ";
+                        }
+                        artists = artists.substring(0, artists.length-2);
+                        bot.chat("Similar artists to " + artistChoice + ": " + artists);
+                    }
+                    else{
+                        bot.chat("No similar artists found.")
                     }
                 });
                 break;
@@ -505,7 +557,7 @@ PlugAPI.getAuth({
                     bot.chat("Try .translate followed by something to translate.");
                 }
                 break
-            case '.autotranslate': //Autotranslate a given user with .autotranslate [givenUser]
+            case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
                 if (qualifier!=""){
                     translateList.push(qualifier);
                     bot.chat("Autotranslating user " + qualifier + ".");

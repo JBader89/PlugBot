@@ -7,6 +7,7 @@ Commands
 --------
 
 .about - Returns a description of the bot's purpose, creator, and usability.  
+.album - Returns the album of the current song.  
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.  
 .calc - Calculates the solution to a given mathematical problem with .calc [equation].  
 .commands - Returns the list of commands.   
@@ -21,7 +22,8 @@ Commands
 .join - Makes the bot join the waitlist.  
 .leave - Makes the bot leave the waitlist.  
 .meh - Makes the bot cast a downvote.  
-.props - Makes the bot give props to the user.   
+.props - Makes the bot give props to the user. 
+.similar - Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist.   
 .skip - Makes the bot skip the current song.  
 .track - Returns Last.fm info about the current song.  
 .translate - Returns a translation of given words with .translate [givenWords] '([language])', English by default.  
