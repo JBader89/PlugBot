@@ -8,7 +8,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -17,12 +17,6 @@ var lfm = new LastfmAPI({
     'api_key' : 'd657909b19fde5ac1491b756b6869d38',
     'secret' : '571e2972ae56bd9c1c6408f13696f1f3'
 });
-
-// lfm.artist.getEvents({
-//     'artist' : 'Zero 7'
-// }, function (err, events) {
-//     console.log(events);
-// });
 
 var api = require('dictionaryapi'); //Use 'npm install dictionaryapi'
 var Wiki = require("wikijs"); //Use 'npm install wikijs'
@@ -37,7 +31,7 @@ var translateList = [];
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -60,7 +54,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .similar, 3. .urban, 4. update .wiki, 5. .events
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .urban, 3. update .wiki, 4. .events
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
