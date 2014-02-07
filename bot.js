@@ -64,7 +64,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns the list of commands
-                bot.chat("List of Commands: .about, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .google, .github, .hey, .meh, .props, .track, .translate, .wiki, and .woot");
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .google, .github, .hey, .meh, .props, .similar, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
                 bot.chat("Well hey there! @"+data.from);
