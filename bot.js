@@ -290,7 +290,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".events": //Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist
+            case ".events": //Returns upcoming events of the current artist, .events [givenArtist] returns upcoming events of a given artist
                 var artistChoice="";
                 if (qualifier==""){
                     artistChoice=bot.getMedia().author;
