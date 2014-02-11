@@ -54,7 +54,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .urban, 3. update .wiki, 4. .events
+    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .urban, 3. update .wiki
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -63,8 +63,8 @@ PlugAPI.getAuth({
         }
         switch (command)
         {
-            case ".commands": //Returns the list of commands
-                bot.chat("List of Commands: .about, .album, .artist, .calc, .commands, .damnright, .define, .facebook, .forecast, .genre, .google, .github, .hey, .meh, .props, .similar, .track, .translate, .wiki, and .woot");
+            case ".commands": //Returns a list of the most important commands
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
                 bot.chat("Well hey there! @"+data.from);
@@ -245,8 +245,20 @@ PlugAPI.getAuth({
                     'track' : bot.getMedia().title
                 }, function (err, track) {
                     if (track!=undefined){
-                        bot.chat(track.name + " is from the album " + track.album.title + ".");
-                        bot.chat("Check out the full album: " + track.album.url);
+                        lfm.album.getInfo({
+                            'artist' : bot.getMedia().author,
+                            'album' : track.album.title
+                        }, function (err, album) {
+                            var albumMessage = track.name + " is from the album " + track.album.title;
+                            if (album.wiki!=undefined){
+                                if (album.wiki.summary.indexOf('released on') != -1){
+                                    var year = album.wiki.summary.substring(album.wiki.summary.indexOf('released on')).split(' ')[4].substring(0,4);
+                                    albumMessage = albumMessage + " (" + year + ")";
+                                }
+                            }
+                            bot.chat(albumMessage);
+                            bot.chat("Check out the full album: " + track.album.url);
+                        });
                     }
                     else{
                         bot.chat("No album found.")
@@ -274,7 +286,35 @@ PlugAPI.getAuth({
                         bot.chat("Similar artists to " + artistChoice + ": " + artists);
                     }
                     else{
-                        bot.chat("No similar artists found.")
+                        bot.chat("No similar artists found.");
+                    }
+                });
+                break;
+            case ".events": //Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist
+                var artistChoice="";
+                if (qualifier==""){
+                    artistChoice=bot.getMedia().author;
+                }
+                else{
+                    artistChoice=qualifier;
+                }
+                lfm.artist.getEvents({
+                    'limit' : 4,
+                    'artist' : artistChoice
+                }, function (err, events) {
+                    if (events!=undefined){
+                        var upcomingEvents = '';
+                        if (!(events.event instanceof Array)){
+                            events.event = [events.event];
+                        }
+                        for (var i=0; i<events.event.length; i++){
+                            upcomingEvents = upcomingEvents + " " + events.event[i].venue.name + " (" + events.event[i].venue.location.city + " " + events.event[i].startDate.split(/\s+/).slice(2,4).join(" ") + "), ";
+                        }
+                        upcomingEvents = upcomingEvents.substring(0, upcomingEvents.length-2);
+                        bot.chat("Upcoming events for " + artistChoice + ":" + upcomingEvents);
+                    }
+                    else{
+                        bot.chat("No upcoming events found.");
                     }
                 });
                 break;
