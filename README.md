@@ -10,8 +10,9 @@ Commands
 .album - Returns the album of the current song.  
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.  
 .calc - Calculates the solution to a given mathematical problem with .calc [equation].  
-.commands - Returns the list of commands.   
-.define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].  
+.commands - Returns a list of the most important commands.   
+.define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].
+.events - Returns upcoming events of the current artist, .events [givenArtist] returns upcoming events of a given artist.
 .facebook - Returns a link to the Chillout Mixer Facebook page.  
 .forecast - Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState].  
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
