@@ -9,10 +9,11 @@ Commands
 .about - Returns a description of the bot's purpose, creator, and usability.  
 .album - Returns the album of the current song.  
 .artist - Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist.  
+.autotranslate - Autotranslates a given user with .autotranslate [givenUser].  
 .calc - Calculates the solution to a given mathematical problem with .calc [equation].  
 .commands - Returns a list of the most important commands.   
-.define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].
-.events - Returns upcoming events of the current artist, .events [givenArtist] returns upcoming events of a given artist.
+.define - Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord].  
+.events - Returns upcoming events of the current artist, .events [givenArtist] returns upcoming events of a given artist.  
 .facebook - Returns a link to the Chillout Mixer Facebook page.  
 .forecast - Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState].  
 .genre - Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist.  
@@ -28,5 +29,6 @@ Commands
 .skip - Makes the bot skip the current song.  
 .track - Returns Last.fm info about the current song.  
 .translate - Returns a translation of given words with .translate [givenWords] '([language])', English by default.  
+.untranslate - Stops autotranslating a given user with .untranslate [givenUser].  
 .wiki - Returns Wikipedia article summary of a given query with .define [givenWord].  
 .woot - Makes the bot cast an upvote.  
