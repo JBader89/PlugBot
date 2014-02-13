@@ -26,6 +26,7 @@ Commands
 .meh - Makes the bot cast a downvote.  
 .props - Makes the bot give props to the user.  
 .similar - Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist.  
+.soundcloud - Returns the current artist's Soundcloud, .soundcloud [givenArtist] returns a given artist's SoundCloud.  
 .skip - Makes the bot skip the current song.  
 .track - Returns Last.fm info about the current song.  
 .translate - Returns a translation of given words with .translate [givenWords] '([language])', English by default.  

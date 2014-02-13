@@ -3,7 +3,6 @@ var ROOM = 'terminally-chillin'; //Enter your room name
 var UPDATECODE = 'p9R*';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
-
 var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
@@ -12,22 +11,26 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
 });
 
 var LastfmAPI = require('lastfmapi');
-
 var lfm = new LastfmAPI({
     'api_key' : 'd657909b19fde5ac1491b756b6869d38',
     'secret' : '571e2972ae56bd9c1c6408f13696f1f3'
 });
 
 var api = require('dictionaryapi'); //Use 'npm install dictionaryapi'
+
 var Wiki = require("wikijs"); //Use 'npm install wikijs'
+
 var google_geocoding = require('google-geocoding'); //Use 'npm install google-geocoding'
 var weather = require('weathers'); //Use 'npm install weathers'
+
 var mlexer = require('math-lexer'); //Use 'npm install math-lexer'
 
 var MsTranslator = require('mstranslator'); //Use 'npm install mstranslator'
 var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="}); //Get own Microsoft Translator account with client_id and client_secret
-
 var translateList = [];
+
+var request = require('request');
+
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
@@ -54,7 +57,7 @@ PlugAPI.getAuth({
     bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
-    bot.on('chat', function(data) { //TODO: 1. .sc, 2. .urban, 3. update .wiki
+    bot.on('chat', function(data) {
         var command=data.message.split(' ')[0];
         var firstIndex=data.message.indexOf(' ');
         var qualifier="";
@@ -64,7 +67,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
-                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .track, .translate, .wiki, and .woot");
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
                 bot.chat("Well hey there! @"+data.from);
@@ -99,6 +102,7 @@ PlugAPI.getAuth({
             case ".about": //Returns a description of the bot's purpose, creator, and usability
                 bot.chat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
                 break;
+            case ".fb":
             case ".facebook": //Returns a link to the Chillout Mixer Facebook page
                 bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
                 break;
@@ -318,6 +322,28 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
+            case ".sc":
+            case ".soundcloud": //Returns the current artist's Soundcloud, .soundcloud [givenArtist] returns a given artist's SoundCloud
+                var artistChoice="";
+                if (qualifier==""){
+                    artistChoice = bot.getMedia().author;
+                }
+                else{
+                    artistChoice=qualifier;
+                }
+                var link = 'http://api.soundcloud.com/users.json?q=' + artistChoice + '&consumer_key=apigee';
+                request(link, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        var info = JSON.parse(body);
+                        if (info[0] != undefined){
+                            bot.chat(info[0].username + ": " + info[0].permalink_url);
+                        }
+                        else{
+                             bot.chat("No soundcloud found.");
+                         }
+                    }
+                });
+                break;
             case ".grab": //Makes the bot grab the current song
                 if (data.from=='TerminallyChill'){
                     bot.getPlaylists(function(playlists) {
@@ -370,7 +396,7 @@ PlugAPI.getAuth({
                             result=result.substring(0, 247)+"...";
                         }  
                         bot.chat(result);
-                        bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
+                        //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                     }
                     else{
                         bot.chat("No definition found.")
@@ -536,6 +562,7 @@ PlugAPI.getAuth({
                     bot.chat("/me does not compute.");
                 }
                 break;
+            case ".tl":
             case ".translate": //Returns a translation of given words with .translate [givenWords] '([language])', English by default
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
                 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
@@ -591,6 +618,7 @@ PlugAPI.getAuth({
                     bot.chat("Try .translate followed by something to translate.");
                 }
                 break
+            case '.auto':
             case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
                 if (qualifier!=""){
                     translateList.push(qualifier);
@@ -600,6 +628,7 @@ PlugAPI.getAuth({
                     bot.chat("Try .autotranslate followed by a username.");
                 }
                 break;
+            case '.undo':
             case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
                 if (qualifier!=""){
                     if (translateList.indexOf(qualifier) != -1) {
