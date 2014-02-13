@@ -323,7 +323,7 @@ PlugAPI.getAuth({
                 });
                 break;
             case ".sc":
-            case ".soundcloud": //Returns the current artist's Soundcloud, .soundcloud [givenArtist] returns a given artist's SoundCloud
+            case ".soundcloud": //Returns the current artist's SC page, .soundcloud [givenArtist] returns a given artist's SC page
                 var artistChoice="";
                 if (qualifier==""){
                     artistChoice = bot.getMedia().author;
