@@ -294,7 +294,7 @@ PlugAPI.getAuth({
                     }
                 });
                 break;
-            case ".events": //Returns upcoming events of the current artist, .events [givenArtist] returns upcoming events of a given artist
+            case ".events": //Returns the artist's upcoming events, .events [givenArtist] returns a given artist's upcoming events
                 var artistChoice="";
                 if (qualifier==""){
                     artistChoice=bot.getMedia().author;
