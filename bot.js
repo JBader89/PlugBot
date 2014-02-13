@@ -1,6 +1,6 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
 var ROOM = 'terminally-chillin'; //Enter your room name
-var UPDATECODE = 'p9R*';
+var UPDATECODE = '4w@fWs$';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
 var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
@@ -303,7 +303,7 @@ PlugAPI.getAuth({
                     artistChoice=qualifier;
                 }
                 lfm.artist.getEvents({
-                    'limit' : 4,
+                    'limit' : 3,
                     'artist' : artistChoice
                 }, function (err, events) {
                     if (events!=undefined){
@@ -312,10 +312,22 @@ PlugAPI.getAuth({
                             events.event = [events.event];
                         }
                         for (var i=0; i<events.event.length; i++){
-                            upcomingEvents = upcomingEvents + " " + events.event[i].venue.name + " (" + events.event[i].venue.location.city + " " + events.event[i].startDate.split(/\s+/).slice(2,4).join(" ") + "), ";
+                            upcomingEvents = upcomingEvents + events.event[i].startDate.split(/\s+/).slice(2,3).join(" ") + "/" + events.event[i].startDate.split(/\s+/).slice(1,2).join(" ").slice(-1) + "/" + events.event[i].startDate.split(/\s+/).slice(3,4).join(" ").slice(-2) + " at " + events.event[i].venue.name + " in " + events.event[i].venue.location.city + ", " + events.event[i].venue.location.country + "; ";
                         }
                         upcomingEvents = upcomingEvents.substring(0, upcomingEvents.length-2);
-                        bot.chat("Upcoming events for " + artistChoice + ":" + upcomingEvents);
+                        upcomingEvents=upcomingEvents.replace(/Jan/g, '1');
+                        upcomingEvents=upcomingEvents.replace(/Feb/g, '2');
+                        upcomingEvents=upcomingEvents.replace(/Mar/g, '3');
+                        upcomingEvents=upcomingEvents.replace(/Apr/g, '4');
+                        upcomingEvents=upcomingEvents.replace(/May/g, '5');
+                        upcomingEvents=upcomingEvents.replace(/Jun/g, '6');
+                        upcomingEvents=upcomingEvents.replace(/Jul/g, '7');
+                        upcomingEvents=upcomingEvents.replace(/Aug/g, '8');
+                        upcomingEvents=upcomingEvents.replace(/Sep/g, '9');
+                        upcomingEvents=upcomingEvents.replace(/Oct/g, '10');
+                        upcomingEvents=upcomingEvents.replace(/Nov/g, '11');
+                        upcomingEvents=upcomingEvents.replace(/Dec/g, '12');
+                        bot.chat("Upcoming events for " + artistChoice + ": " + upcomingEvents);
                     }
                     else{
                         bot.chat("No upcoming events found.");
@@ -588,13 +600,20 @@ PlugAPI.getAuth({
                                     });
                                 }
                                 else{
+                                    var givenLanguage='';
                                     var language2 = qualifier.substring(qualifier.indexOf('(')+1, qualifier.lastIndexOf(')')).toLowerCase();
-                                    language2 = language2.charAt(0).toUpperCase() + language2.slice(1);
-                                    if (languages.indexOf(language2) > -1){    
+                                    if (languageCodes.indexOf(language2) > -1){
+                                        givenLanguage = language2;
+                                    }
+                                    else{
+                                        language2 = language2.charAt(0).toUpperCase() + language2.slice(1);
+                                        givenLanguage = languageCodes[languages.indexOf(language2)];
+                                    }
+                                    if (languages.indexOf(language2) > -1 || languageCodes.indexOf(language2) > -1){    
                                         var params2 = { 
                                             text: qualifier,
                                             from: language,
-                                            to: languageCodes[languages.indexOf(language2)]
+                                            to: givenLanguage
                                         };
                                         client.initialize_token(function(keys){ 
                                             client.translate(params2, function(err, data) {
