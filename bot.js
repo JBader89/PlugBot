@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'terminally-chillin'; //Enter your room name
+var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
 var UPDATECODE = '4w@fWs$';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -29,12 +29,12 @@ var MsTranslator = require('mstranslator'); //Use 'npm install mstranslator'
 var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW15tIQJC7EsocKJsnACzxFbh2GqdpHfog="}); //Get own Microsoft Translator account with client_id and client_secret
 var translateList = [];
 
-var request = require('request');
+var request = require('request'); //Use 'npm install request'
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -639,24 +639,28 @@ PlugAPI.getAuth({
                 break
             case '.auto':
             case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
-                if (qualifier!=""){
-                    translateList.push(qualifier);
-                    bot.chat("Autotranslating user " + qualifier + ".");
-                }
-                else{
-                    bot.chat("Try .autotranslate followed by a username.");
+                if (data.from=="TerminallyChill"){
+                    if (qualifier!=""){
+                        translateList.push(qualifier);
+                        bot.chat("Autotranslating user " + qualifier + ".");
+                    }
+                    else{
+                        bot.chat("Try .autotranslate followed by a username.");
+                    }
                 }
                 break;
             case '.undo':
             case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
-                if (qualifier!=""){
-                    if (translateList.indexOf(qualifier) != -1) {
-                        translateList.splice(translateList.indexOf(qualifier), 1);
+                if (data.from=="TerminallyChill"){
+                    if (qualifier!=""){
+                        if (translateList.indexOf(qualifier) != -1) {
+                            translateList.splice(translateList.indexOf(qualifier), 1);
+                        }
+                        bot.chat("Stopped autotranslating user " + qualifier + ".");
                     }
-                    bot.chat("Stopped autotranslating user " + qualifier + ".");
-                }
-                else{
-                    bot.chat("Try .untranslate followed by a username.");
+                    else{
+                        bot.chat("Try .untranslate followed by a username.");
+                    }
                 }
                 break;
             case ".google": //Returns a lmgtfy (google) link with .google [givenWord]

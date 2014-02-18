@@ -19,6 +19,7 @@
 	"main": "./src/index.js",
 	"lib": "./src/index.js",
 	"dependencies": {
+		"plug-dj-login": "*",
 		"coffee-script": "*",
 		"node-uuid": "*",
 		"node-html-encoder": "*",
@@ -26,6 +27,9 @@
 		"cheerio": "*",
 		"ws": "*",
 		"request": "*"
+	},
+	"optionalDependencies": {
+		"querystring": "*"
 	},
 	"repository": {
 		"type": "git",
