@@ -307,7 +307,6 @@ PlugAPI.getAuth({
                     'artist' : artistChoice
                 }, function (err, events) {
                     if (events!=undefined){
-                        console.log(events);
                         var upcomingEvents = '';
                         if (!(events.event instanceof Array)){
                             events.event = [events.event];
