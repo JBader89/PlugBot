@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+var ROOM = 'terminally-chillin'; //Enter your room name
 var UPDATECODE = '4w@fWs$';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -34,7 +34,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -93,7 +93,7 @@ PlugAPI.getAuth({
                 bot.chat("Leaving waitlist.");
                 break;
             case ".skip": //Makes the bot skip the current song
-                bot.skipSong();
+                bot.skipSong(bot.getDJs()[0].id);
                 bot.chat("Skipping!");
                 break;
             case ".github": //Returns a link to the bot's GitHub repository
@@ -307,12 +307,20 @@ PlugAPI.getAuth({
                     'artist' : artistChoice
                 }, function (err, events) {
                     if (events!=undefined){
+                        console.log(events);
                         var upcomingEvents = '';
                         if (!(events.event instanceof Array)){
                             events.event = [events.event];
                         }
                         for (var i=0; i<events.event.length; i++){
-                            upcomingEvents = upcomingEvents + events.event[i].startDate.split(/\s+/).slice(2,3).join(" ") + "/" + events.event[i].startDate.split(/\s+/).slice(1,2).join(" ").slice(-1) + "/" + events.event[i].startDate.split(/\s+/).slice(3,4).join(" ").slice(-2) + " at " + events.event[i].venue.name + " in " + events.event[i].venue.location.city + ", " + events.event[i].venue.location.country + "; ";
+                            var day = '';
+                            if (events.event[i].startDate.split(/\s+/).slice(1,2).join(" ").slice(0,1) == '0'){
+                                day = events.event[i].startDate.split(/\s+/).slice(1,2).join(" ").slice(1,2);
+                            }
+                            else{
+                                day = events.event[i].startDate.split(/\s+/).slice(1,2).join(" ");
+                            }
+                            upcomingEvents = upcomingEvents + events.event[i].startDate.split(/\s+/).slice(2,3).join(" ") + "/" + day + "/" + events.event[i].startDate.split(/\s+/).slice(3,4).join(" ").slice(-2) + " at " + events.event[i].venue.name + " in " + events.event[i].venue.location.city + ", " + events.event[i].venue.location.country + "; ";
                         }
                         upcomingEvents = upcomingEvents.substring(0, upcomingEvents.length-2);
                         upcomingEvents=upcomingEvents.replace(/Jan/g, '1');
