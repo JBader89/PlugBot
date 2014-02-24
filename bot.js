@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'terminally-chillin'; //Enter your room name
+var ROOM = 'lush-chill-beats-idm-more'; //Enter your room name
 var UPDATECODE = '4w@fWs$';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -681,11 +681,11 @@ PlugAPI.getAuth({
                 }
                 break;    
             default: //Checks for users that are set to be autotranslated whenever they chat
+                var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
+                var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
                 if (translateList.indexOf(data.from)!=-1){
                     var user = data.from;
                     var message = data.message;
-                    var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
-                    var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
                     var params = { 
                         text: message 
                     };
@@ -707,6 +707,24 @@ PlugAPI.getAuth({
                             }
                         });
                     });
+                }
+                else if (command.charAt(0) == "@" && translateList.indexOf(command.slice(1)) != -1 && data.from != 'GeniusBot'){
+                    for (var i=0; i<bot.getUsers().length; i++){
+                        if (bot.getUsers()[i].username == command.slice(1)){
+                            var params = { 
+                                text: qualifier,
+                                from: 'en',
+                                to: bot.getUsers()[i].language
+                            };
+                            if (bot.getUsers()[i].language != 'en'){
+                                client.initialize_token(function(keys){ 
+                                    client.translate(params, function(err, data){
+                                        bot.chat(command + " " + data);
+                                    });
+                                });
+                            }
+                        }
+                    }
                 }
                 break;
         }
