@@ -64,6 +64,9 @@ PlugAPI.getAuth({
         if (firstIndex!=-1){
             qualifier = data.message.substring(firstIndex+1, data.message.length);
         }
+        qualifier=qualifier.replace(/&#39;/g, '\'');
+        qualifier=qualifier.replace(/&#34;/g, '\"');
+        qualifier=qualifier.replace(/&amp;/g, '\&');
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
@@ -592,9 +595,6 @@ PlugAPI.getAuth({
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
                 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
                 if (qualifier!=""){
-                    qualifier=qualifier.replace(/&#39;/g, '\'');
-                    qualifier=qualifier.replace(/&#34;/g, '\"');
-                    qualifier=qualifier.replace(/&amp;/g, '\&');
                     var params = { 
                         text: qualifier 
                     };
@@ -693,8 +693,12 @@ PlugAPI.getAuth({
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
                 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
                 if (translateList.indexOf(data.from)!=-1){
+                    qualifier = data.message;
+                    qualifier=qualifier.replace(/&#39;/g, '\'');
+                    qualifier=qualifier.replace(/&#34;/g, '\"');
+                    qualifier=qualifier.replace(/&amp;/g, '\&');
                     var user = data.from;
-                    var message = data.message;
+                    var message = qualifier;
                     var params = { 
                         text: message 
                     };
