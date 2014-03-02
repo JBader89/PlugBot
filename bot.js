@@ -521,39 +521,44 @@ PlugAPI.getAuth({
                 }
                 break;
             case ".forecast": //Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState]
-                google_geocoding.geocode(qualifier, function(err, location) {
-                    if (location!=null){
-                        weather.getWeather(location.lat, location.lng, function(err, data){
-                            if (data!=null){
-                                var weekForecast="Forecast for "+data.location.areaDescription+": Current: "+data.currentobservation.Temp+"°F "+data.currentobservation.Weather;
-                                for (var i=0; i<7; i++){
-                                    var day = data.time.startPeriodName[i].split(' ');
-                                    if (day[1]!='Night'){
-                                        weekForecast=weekForecast+"; "+data.time.startPeriodName[i]+": ";
-                                    }
-                                    else{
-                                        weekForecast=weekForecast+", ";
-                                    }
-                                    weekForecast=weekForecast+data.time.tempLabel[i]+": "+data.data.temperature[i]+"°F";
-                                } 
-                                weekForecast=weekForecast.replace(/Sunday/g, 'Sun');
-                                weekForecast=weekForecast.replace(/Monday/g, 'Mon');
-                                weekForecast=weekForecast.replace(/Tuesday/g, 'Tues');
-                                weekForecast=weekForecast.replace(/Wednesday/g, 'Wed');
-                                weekForecast=weekForecast.replace(/Thursday/g, 'Thurs');
-                                weekForecast=weekForecast.replace(/Friday/g, 'Fri');
-                                weekForecast=weekForecast.replace(/Saturday/g, 'Sat');
-                                bot.chat(weekForecast);
-                            }
-                            else{
-                                bot.chat("No weather found.")
-                            }
-                        });
-                    }
-                    else{
-                        bot.chat("No weather found.")
-                    }
-                });
+                if (qualifier==""){
+                    bot.chat("Try .forecast followed by a US state, city, or zip to look up.");
+                }
+                else{
+                    google_geocoding.geocode(qualifier, function(err, location) {
+                        if (location!=null){
+                            weather.getWeather(location.lat, location.lng, function(err, data){
+                                if (data!=null){
+                                    var weekForecast="Forecast for "+data.location.areaDescription+": Current: "+data.currentobservation.Temp+"°F "+data.currentobservation.Weather;
+                                    for (var i=0; i<7; i++){
+                                        var day = data.time.startPeriodName[i].split(' ');
+                                        if (day[1]!='Night'){
+                                            weekForecast=weekForecast+"; "+data.time.startPeriodName[i]+": ";
+                                        }
+                                        else{
+                                            weekForecast=weekForecast+", ";
+                                        }
+                                        weekForecast=weekForecast+data.time.tempLabel[i]+": "+data.data.temperature[i]+"°F";
+                                    } 
+                                    weekForecast=weekForecast.replace(/Sunday/g, 'Sun');
+                                    weekForecast=weekForecast.replace(/Monday/g, 'Mon');
+                                    weekForecast=weekForecast.replace(/Tuesday/g, 'Tues');
+                                    weekForecast=weekForecast.replace(/Wednesday/g, 'Wed');
+                                    weekForecast=weekForecast.replace(/Thursday/g, 'Thurs');
+                                    weekForecast=weekForecast.replace(/Friday/g, 'Fri');
+                                    weekForecast=weekForecast.replace(/Saturday/g, 'Sat');
+                                    bot.chat(weekForecast);
+                                }
+                                else{
+                                    bot.chat("No weather found.")
+                                }
+                            });
+                        }
+                        else{
+                            bot.chat("No weather found.")
+                        }
+                    });
+                }
                 break;
             case ".calc": //Calculates the solution to a given mathematical problem with .calc [equation]
                 var counter = 0;
@@ -566,7 +571,8 @@ PlugAPI.getAuth({
                         counter2++;
                     } 
                 }
-                if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/[\!\,\@\'\"\?\#\$\%\&\_\=\<\>\:\;\[\]\{\}\`\~\||log]/g.test(qualifier)) &&  !(/\^\s{0,}\d{0,}\s{0,}\^/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\*\/\^]/g.test(qualifier)) && (!(/([a-zA-Z])\d/g.test(qualifier))) && !(/\d([a-zA-Z])/g.test(qualifier)) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
+                qualifier=qualifier.replace(/x/g, '*');
+                if (qualifier!="" && !(/\d\(/g.test(qualifier)) && !(/[\!\,\@\'\"\?\#\$\%\&\_\=\<\>\:\;\[\]\{\}\`\~\||log]/g.test(qualifier)) &&  !(/\^\s{0,}\d{0,}\s{0,}\^/g.test(qualifier)) && !(/\)\d/g.test(qualifier)) && !(/^[\+\*\/\^]/g.test(qualifier)) && !(/[\+\-\*\/\^]$/g.test(qualifier)) && !(/[\+\-\*\/\^]\s{0,}[\+\*\/\^]/g.test(qualifier)) && (!(/([a-zA-Z])/g.test(qualifier))) && !(/\d\s{1,}\d/g.test(qualifier)) && !(/\s\.\s/g.test(qualifier)) && !(/\.\d\./g.test(qualifier)) && !(/\d\.\s{1,}\d/g.test(qualifier)) && !(/\d\s{1,}\.\d/g.test(qualifier)) && !(/\.\./g.test(qualifier)) && counter==counter2){
                     func=qualifier;
                     func+=" + (0*x) + (0*y)";
                     var realfunc=mlexer.parseString(func);
@@ -593,7 +599,7 @@ PlugAPI.getAuth({
             case ".tl":
             case ".translate": //Returns a translation of given words with .translate [givenWords] '([language])', English by default
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
-                var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
+                var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese', 'Chinese', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];
                 if (qualifier!=""){
                     var params = { 
                         text: qualifier 
@@ -691,7 +697,7 @@ PlugAPI.getAuth({
                 break;    
             default: //Checks for users that are set to be autotranslated whenever they chat
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
-                var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
+                var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese', 'Chinese', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
                 if (translateList.indexOf(data.from)!=-1){
                     qualifier = data.message;
                     qualifier=qualifier.replace(/&#39;/g, '\'');
