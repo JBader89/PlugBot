@@ -1,6 +1,6 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'terminally-chillin'; //Enter your room name
-var UPDATECODE = '4w@fWs$';
+var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+var UPDATECODE = 'h90';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
 var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
@@ -67,6 +67,8 @@ PlugAPI.getAuth({
         qualifier=qualifier.replace(/&#39;/g, '\'');
         qualifier=qualifier.replace(/&#34;/g, '\"');
         qualifier=qualifier.replace(/&amp;/g, '\&');
+        qualifier=qualifier.replace(/&lt;/gi, '\<');
+        qualifier=qualifier.replace(/&gt;/gi, '\>');
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
@@ -167,11 +169,11 @@ PlugAPI.getAuth({
                                 bot.chat("For more info: http://www.last.fm/music/" + lastfmArtist);
                             }
                             else {
-                                bot.chat("No artist info found.")
+                                bot.chat("No artist info found.");
                             }
                         }
                         else {
-                            bot.chat("No artist info found.")
+                            bot.chat("No artist info found.");
                         }
                     }
                 });
@@ -196,11 +198,11 @@ PlugAPI.getAuth({
                                 bot.chat(summary);
                             }
                             else {
-                                bot.chat("No track info found.")
+                                bot.chat("No track info found.");
                             }
                         }
                         else {
-                            bot.chat("No track info found.")
+                            bot.chat("No track info found.");
                         }
                     }
                 });
@@ -268,7 +270,7 @@ PlugAPI.getAuth({
                         });
                     }
                     else{
-                        bot.chat("No album found.")
+                        bot.chat("No album found.");
                     }
                 });
                 break;
@@ -378,7 +380,7 @@ PlugAPI.getAuth({
                                 }
                                 else{
                                     bot.createPlaylist("Library "+playlists.length+1);
-                                    bot.activatePlaylist(playlists[playlists.length-1].id)
+                                    bot.activatePlaylist(playlists[playlists.length-1].id);
                                     var selectedID=playlists[playlists.length-1].id;
                                     bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
                                 }
@@ -399,7 +401,7 @@ PlugAPI.getAuth({
                     result=result.replace(/\s{1,}<sn>/g, '; ');
                     result=result.replace(/\s{1,}<un>/g, ': ');
                     result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
-                    result=result.replace(/\s{1,}:/g,': ')
+                    result=result.replace(/\s{1,}:/g,': ');
                     if (result.indexOf(":") != -1 && (result.indexOf(":")<result.indexOf("1:") || result.indexOf("1:") == -1) && (result.indexOf(":")<result.indexOf("1 a") || result.indexOf("1 a") == -1)) {
                         result=result.substring(result.indexOf(":")+1);
                     }
@@ -422,7 +424,7 @@ PlugAPI.getAuth({
                         //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                     }
                     else{
-                        bot.chat("No definition found.")
+                        bot.chat("No definition found.");
                     }
                 });
                 break;
@@ -550,12 +552,12 @@ PlugAPI.getAuth({
                                     bot.chat(weekForecast);
                                 }
                                 else{
-                                    bot.chat("No weather found.")
+                                    bot.chat("No weather found.");
                                 }
                             });
                         }
                         else{
-                            bot.chat("No weather found.")
+                            bot.chat("No weather found.");
                         }
                     });
                 }
@@ -703,6 +705,8 @@ PlugAPI.getAuth({
                     qualifier=qualifier.replace(/&#39;/g, '\'');
                     qualifier=qualifier.replace(/&#34;/g, '\"');
                     qualifier=qualifier.replace(/&amp;/g, '\&');
+                    qualifier=qualifier.replace(/&lt;/gi, '\<');
+                    qualifier=qualifier.replace(/&gt;/gi, '\>');
                     var user = data.from;
                     var message = qualifier;
                     var params = { 
