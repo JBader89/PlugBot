@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -34,7 +34,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -75,6 +75,9 @@ PlugAPI.getAuth({
                 bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
+            case ".yo":
+            case ".hi":
+            case ".hello":
                 bot.chat("Well hey there! @"+data.from);
                 break;
             case ".woot": //Makes the bot cast an upvote
@@ -523,6 +526,7 @@ PlugAPI.getAuth({
                 }
                 break;
             case ".forecast": //Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState]
+            case ".weather":
                 if (qualifier==""){
                     bot.chat("Try .forecast followed by a US state, city, or zip to look up.");
                 }
@@ -660,7 +664,7 @@ PlugAPI.getAuth({
                 else{
                     bot.chat("Try .translate followed by something to translate.");
                 }
-                break
+                break;
             case '.auto':
             case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
                 if (data.from=="TerminallyChill"){
