@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+var ROOM = 'terminally-chillin'; //Enter your room name
 var UPDATECODE = 'h90';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -34,7 +34,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -47,6 +47,10 @@ PlugAPI.getAuth({
     bot.on('roomJoin', function(data) {
         console.log("I'm live!");
     });
+
+    // bot.on('djAdvance', function(data) {
+    //     console.log(bot.getMedia().title + " - " + bot.getMedia().author + " - " + "got voted:  :+1: " + bot.getRoomScore().positive + " | :-1: " + bot.getRoomScore().negative + " | :purple_heart: " + bot.getRoomScore().curates);
+    // });
 
     //Events which trigger to reconnect the bot when an error occurs
     var reconnect = function() { 
@@ -72,7 +76,7 @@ PlugAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
-                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .track, .translate, .wiki, and .woot");
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .track, .translate, .wiki, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
             case ".yo":
@@ -101,8 +105,10 @@ PlugAPI.getAuth({
                 bot.chat("Leaving waitlist.");
                 break;
             case ".skip": //Makes the bot skip the current song
-                bot.skipSong(bot.getDJs()[0].id);
-                bot.chat("Skipping!");
+                if (data.from=='TerminallyChill'){
+                    bot.skipSong(bot.getDJs()[0].id);
+                    bot.chat("Skipping!");
+                }
                 break;
             case ".github": //Returns a link to the bot's GitHub repository
                 bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
@@ -562,6 +568,30 @@ PlugAPI.getAuth({
                         }
                         else{
                             bot.chat("No weather found.");
+                        }
+                    });
+                }
+                break;
+            case ".temp": //Returns the current temperature in given city with .temp [givenCity], [givenState]
+            case ".temperature":
+                if (qualifier==""){
+                    bot.chat("Try .temp followed by a US state, city, or zip to look up.");
+                }
+                else{
+                    google_geocoding.geocode(qualifier, function(err, location) {
+                        if (location!=null){
+                            weather.getWeather(location.lat, location.lng, function(err, data){
+                                if (data!=null){
+                                    var temp="Current temperature in "+data.location.areaDescription+": "+data.currentobservation.Temp+"°F "+data.currentobservation.Weather;
+                                    bot.chat(temp);
+                                }
+                                else{
+                                    bot.chat("No temperature found.");
+                                }
+                            });
+                        }
+                        else{
+                            bot.chat("No temperature found.");
                         }
                     });
                 }
