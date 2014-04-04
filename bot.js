@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -34,7 +34,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -48,6 +48,7 @@ PlugAPI.getAuth({
         console.log("I'm live!");
     });
 
+    //Event which triggers when the current song receives 5 mehs, skips the song
     bot.on('voteUpdate', function(data) {
         if (bot.getRoomScore().negative > 4){
             bot.chat("!warn");
