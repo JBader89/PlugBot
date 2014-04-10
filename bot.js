@@ -94,24 +94,40 @@ PlugAPI.getAuth({
                 bot.chat("Well hey there! @"+data.from);
                 break;
             case ".woot": //Makes the bot cast an upvote
-                bot.woot();
-                bot.chat("I can dig it!");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.woot();
+                        bot.chat("I can dig it!");
+                    }
+                }
                 break;
             case ".meh": //Makes the bot cast a downvote
-                bot.meh();
-                bot.chat("Please... make it stop :unamused:");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.meh();
+                        bot.chat("Please... make it stop :unamused:");
+                    }
+                }
                 break;
             case ".props": //Makes the bot give props to the user
             case ".propsicle":
                 bot.chat("Nice play! @"+bot.getDJs()[0].username);
                 break;
             case ".join": //Makes the bot join the waitlist
-                bot.waitListJoin();
-                bot.chat("Joining waitlist!");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.waitListJoin();
+                        bot.chat("Joining waitlist!");
+                    }
+                }
                 break;
             case ".leave": //Makes the bot leave the waitlist
-                bot.waitListLeave();
-                bot.chat("Leaving waitlist.");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.waitListLeave();
+                        bot.chat("Leaving waitlist.");
+                    }
+                }
                 break;
             case ".skip": //Makes the bot skip the current song
                 for (var i=0; i<bot.getStaff().length; i++){
