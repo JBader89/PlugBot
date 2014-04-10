@@ -1,5 +1,5 @@
 var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+var ROOM = 'terminally-chillin'; //Enter your room name
 var UPDATECODE = 'h90';
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -49,8 +49,10 @@ PlugAPI.getAuth({
     });
 
     //Event which triggers when the current song receives 5 mehs, skips the song
+    var setmehs = true;
+    var mehs = 4
     bot.on('voteUpdate', function(data) {
-        if (bot.getRoomScore().negative > 4){
+        if (bot.getRoomScore().negative > mehs && setmehs){
             bot.chat("!warn");
         }
     });
@@ -112,9 +114,11 @@ PlugAPI.getAuth({
                 bot.chat("Leaving waitlist.");
                 break;
             case ".skip": //Makes the bot skip the current song
-                if (data.from=='TerminallyChill'){
-                    bot.skipSong(bot.getDJs()[0].id);
-                    bot.chat("Skipping!");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.skipSong(bot.getDJs()[0].id);
+                        bot.chat("Skipping!");
+                    }
                 }
                 break;
             case ".github": //Returns a link to the bot's GitHub repository
@@ -157,6 +161,7 @@ PlugAPI.getAuth({
                                 summary=summary.replace(/(&auml;)/g, 'ä');
                                 summary=summary.replace(/(&iacute;)/g, 'í');
                                 summary=summary.replace(/(&oacute;)/g, 'ó');
+                                summary=summary.replace(/(&Scaron;)/g, 'Š');
                                 summary=summary.replace(/<[^>]+>/g, '');
                                 if (summary.indexOf(" 1) ") != -1){
                                     summary=summary.substring(summary.lastIndexOf(" 1) ")+4);
@@ -207,6 +212,9 @@ PlugAPI.getAuth({
                                 summary=summary.replace(/(&eacute;)/g, 'é');
                                 summary=summary.replace(/(&aacute;)/g, 'á');
                                 summary=summary.replace(/(&auml;)/g, 'ä');
+                                summary=summary.replace(/(&iacute;)/g, 'í');
+                                summary=summary.replace(/(&oacute;)/g, 'ó');
+                                summary=summary.replace(/(&Scaron;)/g, 'Š');
                                 summary=summary.replace(/<[^>]+>/g, '');
                                 if (summary.length>250){
                                     summary=summary.substring(0, 247)+"...";
@@ -386,24 +394,26 @@ PlugAPI.getAuth({
                 });
                 break;
             case ".grab": //Makes the bot grab the current song
-                if (data.from=='TerminallyChill'){
-                    bot.getPlaylists(function(playlists) {
-                        for (var i=0; i<playlists.length; i++){
-                            if (playlists[i].selected){
-                                if (playlists[i].items.length!=200){
-                                    var selectedID=playlists[i].id;
-                                    bot.chat("Added to my "+playlists[i].name+" playlist.");
-                                }
-                                else{
-                                    bot.createPlaylist("Library "+playlists.length+1);
-                                    bot.activatePlaylist(playlists[playlists.length-1].id);
-                                    var selectedID=playlists[playlists.length-1].id;
-                                    bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        bot.getPlaylists(function(playlists) {
+                            for (var i=0; i<playlists.length; i++){
+                                if (playlists[i].selected){
+                                    if (playlists[i].items.length!=200){
+                                        var selectedID=playlists[i].id;
+                                        bot.chat("Added to my "+playlists[i].name+" playlist.");
+                                    }
+                                    else{
+                                        bot.createPlaylist("Library "+playlists.length+1);
+                                        bot.activatePlaylist(playlists[playlists.length-1].id);
+                                        var selectedID=playlists[playlists.length-1].id;
+                                        bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                                    }
                                 }
                             }
-                        }
-                        bot.addSongToPlaylist(selectedID, bot.getMedia().id);
-                    });
+                            bot.addSongToPlaylist(selectedID, bot.getMedia().id);
+                        });
+                    }
                 }
                 break;
             case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
@@ -461,7 +471,7 @@ PlugAPI.getAuth({
                                                     if (summary=="" || summary.indexOf("This is a redirect")!=-1){
                                                         summary="redirect "+html;
                                                     }
-                                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1 || summary.indexOf('may stand for:')!=-1){
+                                                    if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('can refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1 || summary.indexOf('may stand for:')!=-1){
                                                         bot.chat("This may refer to several things - please be more specific.");
                                                         var queryChoice=qualifier;
                                                         queryChoice=queryChoice.replace(/ /g, '_');
@@ -484,7 +494,7 @@ PlugAPI.getAuth({
                                                         Wiki.page(query, false, function(err, page2){
                                                             page2.content(function(err, content){
                                                                 if (content!=undefined){
-                                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || content.indexOf('may refer to the following:')!=-1 || content.indexOf('may stand for:')!=-1){
+                                                                    if (content.indexOf('may refer to:')!=-1 || content.indexOf('can refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || content.indexOf('may refer to the following:')!=-1 || content.indexOf('may stand for:')!=-1){
                                                                         bot.chat("This may refer to several things - please be more specific.");
                                                                     }
                                                                     else if (subQuery!=''){
@@ -704,27 +714,31 @@ PlugAPI.getAuth({
                 break;
             case '.auto':
             case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
-                if (data.from=="TerminallyChill"){
-                    if (qualifier!=""){
-                        translateList.push(qualifier);
-                        bot.chat("Autotranslating user " + qualifier + ".");
-                    }
-                    else{
-                        bot.chat("Try .autotranslate followed by a username.");
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        if (qualifier!=""){
+                            translateList.push(qualifier);
+                            bot.chat("Autotranslating user " + qualifier + ".");
+                        }
+                        else{
+                            bot.chat("Try .autotranslate followed by a username.");
+                        }
                     }
                 }
                 break;
             case '.undo':
             case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
-                if (data.from=="TerminallyChill"){
-                    if (qualifier!=""){
-                        if (translateList.indexOf(qualifier) != -1) {
-                            translateList.splice(translateList.indexOf(qualifier), 1);
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        if (qualifier!=""){
+                            if (translateList.indexOf(qualifier) != -1) {
+                                translateList.splice(translateList.indexOf(qualifier), 1);
+                            }
+                            bot.chat("Stopped autotranslating user " + qualifier + ".");
                         }
-                        bot.chat("Stopped autotranslating user " + qualifier + ".");
-                    }
-                    else{
-                        bot.chat("Try .untranslate followed by a username.");
+                        else{
+                            bot.chat("Try .untranslate followed by a username.");
+                        }
                     }
                 }
                 break;
@@ -738,6 +752,37 @@ PlugAPI.getAuth({
                     bot.chat("Try .google followed by something to look up.");
                 }
                 break;    
+            case ".skipon": //Turns auto-skip on
+            case ".warnon":
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        setmehs = true;
+                        bot.chat("Auto-skip is now on.");
+                    }
+                }
+                break;
+            case ".skipoff": //Turns auto-skip off
+            case ".warnoff":
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        setmehs = false;
+                        bot.chat("Auto-skip is now off.");
+                    }
+                }
+                break;
+            case ".setmehs": //Sets the number of mehs for auto-skipping with .setmehs [givenNumber]
+                for (var i=0; i<bot.getStaff().length; i++){
+                    if (bot.getStaff()[i].username == data.from){
+                        if (qualifier!="" && !(isNaN(Number(qualifier)))){
+                            mehs = qualifier - 1;
+                            bot.chat("Auto-skip set to " + (mehs+1) + " mehs.");
+                        }
+                        else{
+                            bot.chat("Try .setmehs followed a number of mehs for auto-skipping.");
+                        }
+                    }
+                }
+                break;
             default: //Checks for users that are set to be autotranslated whenever they chat
                 var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
                 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese', 'Chinese', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
