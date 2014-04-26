@@ -42,6 +42,6 @@ Mod Only Commands
 **.skip** - Makes the bot skip the current song.  
 **.skipoff** - Turns auto-skip off.  
 **.skipon** - Turns auto-skip on.  
-**.untranslate** - Stops autotranslating a given user with **.untranslate [givenUser]**. 
+**.untranslate** - Stops autotranslating a given user with **.untranslate [givenUser]**.  
 **.warn** - Skips a user playing an off-genre song.  
 **.woot** - Makes the bot cast an upvote.  
