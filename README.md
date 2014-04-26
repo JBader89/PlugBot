@@ -31,13 +31,17 @@ Mod Only Commands
 --------
 
 **.autotranslate** - Autotranslates a given user with **.autotranslate [givenUser]**.  
+**.banuser** - Bans a user from the room permanently with **.banuser [givenUser]**.  
+**.front** - Moves a user to the front of the waitlist with **.front [givenUser]**.  
 **.grab** - Makes the bot grab the current song.  
 **.join** - Makes the bot join the waitlist.  
 **.leave** - Makes the bot leave the waitlist.  
 **.meh** - Makes the bot cast a downvote.  
+**.move** - Moves a user in the waitlist with **.move [givenUser], [givenSpot]**.    
 **.setmehs** - Sets the number of mehs for auto-skipping with **.setmehs [givenNumber]**.  
 **.skip** - Makes the bot skip the current song.  
 **.skipoff** - Turns auto-skip off.  
 **.skipon** - Turns auto-skip on.  
-**.untranslate** - Stops autotranslating a given user with **.untranslate [givenUser]**.  
+**.untranslate** - Stops autotranslating a given user with **.untranslate [givenUser]**. 
+**.warn** - Skips a user playing an off-genre song.  
 **.woot** - Makes the bot cast an upvote.  

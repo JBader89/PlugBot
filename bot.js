@@ -7,7 +7,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -34,7 +34,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -98,13 +98,13 @@ PlugAPI.getAuth({
             case ".bot":
                 bot.chat("Well hey there! @"+data.from);
                 break;
-            case ".yesplay":
+            case ".yesplay": //Gives the room criteria for acceptable genres
                 bot.chat("Types of music we encourage in the Chillout Mixer: Trip Hop, Ambient, Psybient, Dub, Liquid DnB, Acid Jazz, as well as some occasional \"instrumental\" chillwave/hip hop/trap when it fits. Think downtempo... \"soothing, relaxing electronica.\"");
                 break;
-            case ".noplay":
+            case ".noplay": //Gives the room criteria for unacceptable genres
                 bot.chat("DO NOT PLAY: Rock genres (Indie/Post/Alt/etc), Wubs (Chillstep/Dubstep/Brostep), EDM - Dance Music (Trance/House/etc), or vocal Hip Hop/Rap/Trap. Music MUST be chill and fit the Rooms flow. Repeated failure to obey these rules may = ban.")
                 break;   
-            case ".warn":
+            case ".warn": //Skips a user playing an off-genre song
                 for (var i=0; i<bot.getStaff().length; i++){
                     if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
                         bot.skipSong(bot.getDJs()[0].id);
@@ -112,7 +112,7 @@ PlugAPI.getAuth({
                     }
                 }
                 break;
-            case ".banuser":
+            case ".banuser": //Bans a user from the room permanently with .banuser [givenUser]
                 for (var i=0; i<bot.getStaff().length; i++){
                     if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
                         for (var j=0; j<bot.getUsers().length; j++){
@@ -123,7 +123,7 @@ PlugAPI.getAuth({
                     }
                 }
                 break;
-            case ".move":
+            case ".move": //Moves a user in the waitlist with .move [givenUser], [givenSpot]
                 for (var i=0; i<bot.getStaff().length; i++){
                     if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
                         for (var j=0; j<bot.getUsers().length; j++){
@@ -139,7 +139,7 @@ PlugAPI.getAuth({
                     }
                 }
                 break;
-            case ".front":
+            case ".front": //Moves a user to the front of the waitlist with .front [givenUser]
                 for (var i=0; i<bot.getStaff().length; i++){
                     if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
                         for (var j=0; j<bot.getUsers().length; j++){
