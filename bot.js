@@ -1,13 +1,11 @@
-var PlugAPI = require('./plugapi'); //Use 'npm install plugapi'
-var ROOM = 'terminally-chillin'; //Enter your room name
-var UPDATECODE = 'h90';
+var PlugBotAPI = require('plugbotapi'); //Use 'npm install plugbotapi'
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
 var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, username, and password
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -32,34 +30,59 @@ var translateList = [];
 var request = require('request'); //Use 'npm install request'
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
-PlugAPI.getAuth({
+PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ456'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
         return;
     }
-    var bot = new PlugAPI(auth, UPDATECODE);
+    var bot = new PlugBotAPI(auth);
+    var ROOM = 'terminally-chillin'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
+    var media = null;
+    var waitlist = null;
+    var dj = null;
     bot.on('roomJoin', function(data) {
+        bot.getMedia(function(currentMedia) { 
+            media = currentMedia; 
+        });
+        bot.getWaitList(function(currentWaitlist) { 
+            waitlist = currentWaitlist; 
+        });
+        bot.getDJ(function(currentDJ) { 
+            dj = currentDJ; 
+        });
         console.log("I'm live!");
+    });
+
+    //Event which triggers when new DJ starts playing a song
+    bot.on('djAdvance', function(data) {
+        bot.getMedia(function(currentMedia) { 
+            media = currentMedia; 
+        });
+        bot.getDJ(function(currentDJ) { 
+            dj = currentDJ; 
+        });
+    });
+
+    bot.on('waitListUpdate', function(data) {
+        bot.getWaitList(function(currentWaitlist) { 
+            waitlist = currentWaitlist; 
+        });
     });
 
     //Event which triggers when the current song receives 5 mehs, skips the song
     var setmehs = false;
     var mehs = 4
-    bot.on('voteUpdate', function(data) {
-        if (bot.getRoomScore().negative > mehs && setmehs){
-            bot.skipSong(bot.getDJs()[0].id);
-            bot.chat("@" + bot.getDJs()[0].username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
-        }
-    });
-
-    // bot.on('djAdvance', function(data) {
-    //     console.log(bot.getMedia().title + " - " + bot.getMedia().author + " - " + "got voted:  :+1: " + bot.getRoomScore().positive + " | :-1: " + bot.getRoomScore().negative + " | :purple_heart: " + bot.getRoomScore().curates);
+    // bot.on('voteUpdate', function(data) {
+    //     if (bot.getRoomScore().negative > mehs && setmehs){
+    //         bot.skipSong(bot.getDJs()[0].id);
+    //         bot.chat("@" + bot.getDJs()[0].username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+    //     }
     // });
 
     //Events which trigger to reconnect the bot when an error occurs
@@ -168,7 +191,7 @@ PlugAPI.getAuth({
                 break;
             case ".props": //Makes the bot give props to the user
             case ".propsicle":
-                bot.chat("Nice play! @"+bot.getDJs()[0].username);
+                bot.chat("Nice play! @"+dj.username);
                 break;
             case ".join": //Makes the bot join the waitlist
                 for (var i=0; i<bot.getStaff().length; i++){
@@ -219,7 +242,7 @@ PlugAPI.getAuth({
             case ".artist": //Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist
                 var artistChoice="";
                 if (qualifier==""){
-                    artistChoice=bot.getMedia().author;
+                    artistChoice=media.author;
                 }
                 else{
                     artistChoice=qualifier;
@@ -277,8 +300,8 @@ PlugAPI.getAuth({
                 break;
             case ".track": //Returns Last.fm info about the current song
                 lastfm.getTrackInfo({
-                    artist: bot.getMedia().author,
-                    track: bot.getMedia().title,
+                    artist: media.author,
+                    track: media.title,
                     callback: function(result) {
                         if (result.success==true){
                             if (result.trackInfo.wiki!=undefined){
@@ -310,8 +333,8 @@ PlugAPI.getAuth({
             case ".genre": //Returns the genres of the current artist, .genre [givenArtist] returns the genres of a given artist
                 var artistChoice="";
                 if (qualifier==""){
-                    artistChoice=bot.getMedia().author;
-                    trackChoice=bot.getMedia().title;
+                    artistChoice=media.author;
+                    trackChoice=media.title;
                 }
                 else{
                     artistChoice=qualifier;
@@ -350,12 +373,12 @@ PlugAPI.getAuth({
                 break;
             case ".album": //Returns the album of the current song
                 lfm.track.getInfo({
-                    'artist' : bot.getMedia().author,
-                    'track' : bot.getMedia().title
+                    'artist' : media.author,
+                    'track' : media.title
                 }, function (err, track) {
                     if (track!=undefined){
                         lfm.album.getInfo({
-                            'artist' : bot.getMedia().author,
+                            'artist' : media.author,
                             'album' : track.album.title
                         }, function (err, album) {
                             var albumMessage = track.name + " is from the album " + track.album.title;
@@ -377,7 +400,7 @@ PlugAPI.getAuth({
             case ".similar": //Returns similar artists of the current artist, .similar [givenArtist] returns similar artists of a given artist
                 var artistChoice="";
                 if (qualifier==""){
-                    artistChoice=bot.getMedia().author;
+                    artistChoice=media.author;
                 }
                 else{
                     artistChoice=qualifier;
@@ -403,7 +426,7 @@ PlugAPI.getAuth({
             case ".events": //Returns the artist's upcoming events, .events [givenArtist] returns a given artist's upcoming events
                 var artistChoice="";
                 if (qualifier==""){
-                    artistChoice=bot.getMedia().author;
+                    artistChoice=media.author;
                 }
                 else{
                     artistChoice=qualifier;
@@ -451,7 +474,7 @@ PlugAPI.getAuth({
             case ".soundcloud": //Returns the current artist's SC page, .soundcloud [givenArtist] returns a given artist's SC page
                 var artistChoice="";
                 if (qualifier==""){
-                    artistChoice = bot.getMedia().author;
+                    artistChoice = media.author;
                 }
                 else{
                     artistChoice=qualifier;
@@ -487,48 +510,53 @@ PlugAPI.getAuth({
                                     }
                                 }
                             }
-                            bot.addSongToPlaylist(selectedID, bot.getMedia().id);
+                            bot.addSongToPlaylist(selectedID, media.id);
                         });
                     }
                 }
                 break;
             case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
-                var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
-                var linkQualifier=qualifier;
-                linkQualifier=linkQualifier.replace(/ /g, '%20');
-                dict.query(linkQualifier.toLowerCase(), function(err, result) {
-                    result=result.replace(/<vi>(.*?)<\/vi>|<dx>(.*?)<\/dx>|<dro>(.*?)<\/dro>|<uro>(.*?)<\/uro>|<svr>(.*?)<\/svr>|<sin>(.*?)<\/sin>|<set>(.*?)<\/set>|<pl>(.*?)<\/pl>|<pt>(.*?)<\/pt>|<ss>(.*?)<\/ss>|<ca>(.*?)<\/ca>|<art>(.*?)<\/art>|<ew>(.*?)<\/ew>|<hw>(.*?)<\/hw>|<sound>(.*?)<\/sound>|<pr>(.*?)<\/pr>|<fl>(.*?)<\/fl>|<date>(.*?)<\/date>|<sxn>(.*?)<\/sxn>|<ssl>(.*?)<\/ssl>/g, '');
-                    result=result.replace(/<vt>(.*?)<\/vt>/g,' ');
-                    result=result.replace(/<\/sx> <sx>|<sd>/g,', ');
-                    result=result.replace(/\s{1,}<sn>/g, '; ');
-                    result=result.replace(/\s{1,}<un>/g, ': ');
-                    result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
-                    result=result.replace(/\s{1,}:/g,': ');
-                    if (result.indexOf(":") != -1 && (result.indexOf(":")<result.indexOf("1:") || result.indexOf("1:") == -1) && (result.indexOf(":")<result.indexOf("1 a") || result.indexOf("1 a") == -1)) {
-                        result=result.substring(result.indexOf(":")+1);
-                    }
-                    else if (result.indexOf("1:") != -1 || result.indexOf("1 a") != -1){
-                        if ((result.indexOf("1:")<result.indexOf("1 a") && result.indexOf("1:")!=-1) || result.indexOf("1 a")==-1){
-                            result=result.substring(result.indexOf("1:"));
+                if (qualifier!=""){
+                    var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
+                    var linkQualifier=qualifier;
+                    linkQualifier=linkQualifier.replace(/ /g, '%20');
+                    dict.query(linkQualifier.toLowerCase(), function(err, result) {
+                        result=result.replace(/<vi>(.*?)<\/vi>|<dx>(.*?)<\/dx>|<dro>(.*?)<\/dro>|<uro>(.*?)<\/uro>|<svr>(.*?)<\/svr>|<sin>(.*?)<\/sin>|<set>(.*?)<\/set>|<pl>(.*?)<\/pl>|<pt>(.*?)<\/pt>|<ss>(.*?)<\/ss>|<ca>(.*?)<\/ca>|<art>(.*?)<\/art>|<ew>(.*?)<\/ew>|<hw>(.*?)<\/hw>|<sound>(.*?)<\/sound>|<pr>(.*?)<\/pr>|<fl>(.*?)<\/fl>|<date>(.*?)<\/date>|<sxn>(.*?)<\/sxn>|<ssl>(.*?)<\/ssl>/g, '');
+                        result=result.replace(/<vt>(.*?)<\/vt>/g,' ');
+                        result=result.replace(/<\/sx> <sx>|<sd>/g,', ');
+                        result=result.replace(/\s{1,}<sn>/g, '; ');
+                        result=result.replace(/\s{1,}<un>/g, ': ');
+                        result=result.replace(/<(?!\/entry\s*\/?)[^>]+>/g, '');
+                        result=result.replace(/\s{1,}:/g,': ');
+                        if (result.indexOf(":") != -1 && (result.indexOf(":")<result.indexOf("1:") || result.indexOf("1:") == -1) && (result.indexOf(":")<result.indexOf("1 a") || result.indexOf("1 a") == -1)) {
+                            result=result.substring(result.indexOf(":")+1);
+                        }
+                        else if (result.indexOf("1:") != -1 || result.indexOf("1 a") != -1){
+                            if ((result.indexOf("1:")<result.indexOf("1 a") && result.indexOf("1:")!=-1) || result.indexOf("1 a")==-1){
+                                result=result.substring(result.indexOf("1:"));
+                            }
+                            else{
+                                result=result.substring(result.indexOf("1 a"));
+                            }
+                        }
+                        result=result.substring(0, result.indexOf("</entry>"));
+                        result=result.replace(/\s{1,};/g, ';');
+                        result=result.replace(/\s{1,},/g, ',');
+                        if (result != ''){
+                            if (result.length>250){
+                                result=result.substring(0, 247)+"...";
+                            }  
+                            bot.chat(result);
+                            //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                         }
                         else{
-                            result=result.substring(result.indexOf("1 a"));
+                            bot.chat("No definition found.");
                         }
-                    }
-                    result=result.substring(0, result.indexOf("</entry>"));
-                    result=result.replace(/\s{1,};/g, ';');
-                    result=result.replace(/\s{1,},/g, ',');
-                    if (result != ''){
-                        if (result.length>250){
-                            result=result.substring(0, 247)+"...";
-                        }  
-                        bot.chat(result);
-                        //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
-                    }
-                    else{
-                        bot.chat("No definition found.");
-                    }
-                });
+                    });
+                }
+                else{
+                    bot.chat("Try .define followed by something to look up.");
+                }
                 break;
             case ".wiki": //Returns Wikipedia article summary of a given query with .define [givenWord]
                 if (qualifier!=""){
