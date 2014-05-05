@@ -5,7 +5,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -32,7 +32,7 @@ var request = require('request'); //Use 'npm install request'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ456'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -46,6 +46,9 @@ PlugBotAPI.getAuth({
     var media = null;
     var waitlist = null;
     var dj = null;
+    var staff = null;
+    var users = null;
+    var roomScore = null;
     bot.on('roomJoin', function(data) {
         bot.getMedia(function(currentMedia) { 
             media = currentMedia; 
@@ -55,6 +58,12 @@ PlugBotAPI.getAuth({
         });
         bot.getDJ(function(currentDJ) { 
             dj = currentDJ; 
+        });
+        bot.getStaff(function(currentStaff) { 
+            staff = currentStaff; 
+        });
+        bot.getUsers(function(currentUserbase) { 
+            users = currentUserbase; 
         });
         console.log("I'm live!");
     });
@@ -69,29 +78,43 @@ PlugBotAPI.getAuth({
         });
     });
 
+    //Event which triggers when waitlist changes
     bot.on('waitListUpdate', function(data) {
         bot.getWaitList(function(currentWaitlist) { 
             waitlist = currentWaitlist; 
         });
     });
 
+    //Event which triggers with a user joins the room
+    bot.on('userJoin', function(data) {
+        bot.getStaff(function(currentStaff) { 
+            staff = currentStaff; 
+        });
+        bot.getUsers(function(currentUserbase) { 
+            users = currentUserbase; 
+        });
+    });
+
     //Event which triggers when the current song receives 5 mehs, skips the song
     var setmehs = false;
-    var mehs = 4
-    // bot.on('voteUpdate', function(data) {
-    //     if (bot.getRoomScore().negative > mehs && setmehs){
-    //         bot.skipSong(bot.getDJs()[0].id);
-    //         bot.chat("@" + bot.getDJs()[0].username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
-    //     }
-    // });
+    var mehs = 4;
+    bot.on('voteUpdate', function(data) {
+        bot.getRoomScore(function(currentScore) { 
+            roomScore = currentScore; 
+            if (roomScore.negative > mehs && setmehs){
+                bot.chat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+                bot.moderateForceSkip(dj.id);
+            }
+        });
+    });
 
     //Events which trigger to reconnect the bot when an error occurs
-    var reconnect = function() { 
-        bot.connect(ROOM);
-    };
+    // var reconnect = function() { 
+    //     bot.connect(ROOM);
+    // };
 
-    bot.on('close', reconnect);
-    bot.on('error', reconnect);
+    // bot.on('close', reconnect);
+    // bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
     bot.on('chat', function(data) {
@@ -112,7 +135,7 @@ PlugBotAPI.getAuth({
                 bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .track, .translate, and .wiki");
                 break;
             case ".modcommands": //Returns a list of the most important commands
-                bot.chat("List of Mod Commands: .autotranslate, .banuser, .front, .grab, .join, .leave, .meh, .move, .setmehs, .skip, .skipoff, .skipon, .untranslate, .warn, and .woot");
+                bot.chat("List of Mod Commands: .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .skipoff, .skipon, .untranslate, .warn, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
             case ".yo":
@@ -128,34 +151,34 @@ PlugBotAPI.getAuth({
                 bot.chat("DO NOT PLAY: Rock genres (Indie/Post/Alt/etc), Wubs (Chillstep/Dubstep/Brostep), EDM - Dance Music (Trance/House/etc), or vocal Hip Hop/Rap/Trap. Music MUST be chill and fit the Rooms flow. Repeated failure to obey these rules may = ban.")
                 break;   
             case ".warn": //Skips a user playing an off-genre song
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.skipSong(bot.getDJs()[0].id);
-                        bot.chat("@" + bot.getDJs()[0].username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
+                        bot.chat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+                        bot.moderateForceSkip(dj.id);
                     }
                 }
                 break;
             case ".banuser": //Bans a user from the room permanently with .banuser [givenUser]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
-                        for (var j=0; j<bot.getUsers().length; j++){
-                            if (bot.getUsers()[j].username == qualifier){
-                                bot.moderateBanUser(bot.getUsers()[j].id, "spamming");
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1 && staff[i].permission > 1){
+                        for (var j=0; j<users.length; j++){
+                            if (users[j].username == qualifier){
+                                bot.moderateBanUser(users[j].id, "spamming");
                             }
                         }
                     }
                 }
                 break;
             case ".move": //Moves a user in the waitlist with .move [givenUser], [givenSpot]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
-                        for (var j=0; j<bot.getUsers().length; j++){
-                            if (bot.getUsers()[j].username == qualifier.split(' ')[0]){
-                                if (Number(qualifier.split(' ')[1]) > bot.getWaitList().length){
-                                    bot.chat("Sorry, there are only " + bot.getWaitList().length + " people in the waitlist, please try again.");
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1 && staff[i].permission > 1){
+                        for (var j=0; j<users.length; j++){
+                            if (users[j].username == qualifier.split(' ')[0]){
+                                if (Number(qualifier.split(' ')[1]) > waitlist.length){
+                                    bot.chat("Sorry, there are only " + waitlist.length + " people in the waitlist, please try again.");
                                 }
                                 else{
-                                    bot.moveDJ(bot.getUsers()[j].id, Number(qualifier.split(' ')[1]));
+                                    bot.moderateMoveDJ(users[j].id, Number(qualifier.split(' ')[1]));
                                 }
                             }
                         }
@@ -163,29 +186,29 @@ PlugBotAPI.getAuth({
                 }
                 break;
             case ".front": //Moves a user to the front of the waitlist with .front [givenUser]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1 && bot.getStaff()[i].permission > 1){
-                        for (var j=0; j<bot.getUsers().length; j++){
-                            if (bot.getUsers()[j].username == qualifier.split(' ')[0]){
-                                bot.moveDJ(bot.getUsers()[j].id, 1);
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1 && staff[i].permission > 1){
+                        for (var j=0; j<users.length; j++){
+                            if (users[j].username == qualifier.split(' ')[0]){
+                                bot.moderateMoveDJ(users[j].id, 1);
                             }
                         }
                     }
                 }
                 break;
             case ".woot": //Makes the bot cast an upvote
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.woot();
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         bot.chat("I can dig it!");
+                        bot.woot();
                     }
                 }
                 break;
             case ".meh": //Makes the bot cast a downvote
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.meh();
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         bot.chat("Please... make it stop :unamused:");
+                        bot.meh();
                     }
                 }
                 break;
@@ -194,26 +217,26 @@ PlugBotAPI.getAuth({
                 bot.chat("Nice play! @"+dj.username);
                 break;
             case ".join": //Makes the bot join the waitlist
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.waitListJoin();
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
+                        bot.djJoin();
                         bot.chat("Joining waitlist!");
                     }
                 }
                 break;
             case ".leave": //Makes the bot leave the waitlist
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.waitListLeave();
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
+                        bot.djLeave();
                         bot.chat("Leaving waitlist.");
                     }
                 }
                 break;
             case ".skip": //Makes the bot skip the current song
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.skipSong(bot.getDJs()[0].id);
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         bot.chat("Skipping!");
+                        bot.moderateForceSkip(dj.id);
                     }
                 }
                 break;
@@ -492,29 +515,32 @@ PlugBotAPI.getAuth({
                     }
                 });
                 break;
-            case ".grab": //Makes the bot grab the current song
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
-                        bot.getPlaylists(function(playlists) {
-                            for (var i=0; i<playlists.length; i++){
-                                if (playlists[i].selected){
-                                    if (playlists[i].items.length!=200){
-                                        var selectedID=playlists[i].id;
-                                        bot.chat("Added to my "+playlists[i].name+" playlist.");
-                                    }
-                                    else{
-                                        bot.createPlaylist("Library "+playlists.length+1);
-                                        bot.activatePlaylist(playlists[playlists.length-1].id);
-                                        var selectedID=playlists[playlists.length-1].id;
-                                        bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
-                                    }
-                                }
-                            }
-                            bot.addSongToPlaylist(selectedID, media.id);
-                        });
-                    }
-                }
-                break;
+
+            // Currently not feasible with the new plug.dj API
+            // case ".grab": //Makes the bot grab the current song
+            //     for (var i=0; i<staff.length; i++){
+            //         if (staff[i].username == data.from && staff[i].permission > 1){
+            //             bot.getPlaylists(function(playlists) {
+            //                 for (var i=0; i<playlists.length; i++){
+            //                     if (playlists[i].selected){
+            //                         if (playlists[i].items.length!=200){
+            //                             var selectedID=playlists[i].id;
+            //                             bot.chat("Added to my "+playlists[i].name+" playlist.");
+            //                         }
+            //                         else{
+            //                             bot.createPlaylist("Library "+playlists.length+1);
+            //                             bot.activatePlaylist(playlists[playlists.length-1].id);
+            //                             var selectedID=playlists[playlists.length-1].id;
+            //                             bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+            //                         }
+            //                     }
+            //                 }
+            //                 bot.addSongToPlaylist(selectedID, media.id);
+            //             });
+            //         }
+            //     }
+            //     break;
+
             case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
                 if (qualifier!=""){
                     var dict = new api.DictionaryAPI(api.COLLEGIATE, 'cf2109fd-f2d0-4451-a081-17b11c48069b');
@@ -818,8 +844,8 @@ PlugBotAPI.getAuth({
                 break;
             case '.auto':
             case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         if (qualifier!=""){
                             translateList.push(qualifier);
                             bot.chat("Autotranslating user " + qualifier + ".");
@@ -832,8 +858,8 @@ PlugBotAPI.getAuth({
                 break;
             case '.undo':
             case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         if (qualifier!=""){
                             if (translateList.indexOf(qualifier) != -1) {
                                 translateList.splice(translateList.indexOf(qualifier), 1);
@@ -858,8 +884,8 @@ PlugBotAPI.getAuth({
                 break;    
             case ".skipon": //Turns auto-skip on
             case ".warnon":
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         setmehs = true;
                         bot.chat("Auto-skip is now on.");
                     }
@@ -867,16 +893,16 @@ PlugBotAPI.getAuth({
                 break;
             case ".skipoff": //Turns auto-skip off
             case ".warnoff":
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         setmehs = false;
                         bot.chat("Auto-skip is now off.");
                     }
                 }
                 break;
             case ".setmehs": //Sets the number of mehs for auto-skipping with .setmehs [givenNumber]
-                for (var i=0; i<bot.getStaff().length; i++){
-                    if (bot.getStaff()[i].username == data.from && bot.getStaff()[i].permission > 1){
+                for (var i=0; i<staff.length; i++){
+                    if (staff[i].username == data.from && staff[i].permission > 1){
                         if (qualifier!="" && !(isNaN(Number(qualifier)))){
                             mehs = qualifier - 1;
                             bot.chat("Auto-skip set to " + (mehs+1) + " mehs.");
@@ -922,14 +948,14 @@ PlugBotAPI.getAuth({
                     });
                 }
                 else if (command.charAt(0) == "@" && translateList.indexOf(command.slice(1)) != -1 && data.from != 'GeniusBot'){ //Autotranslates into @[givenUser]'s language when message begins with @[givenUser]
-                    for (var i=0; i<bot.getUsers().length; i++){
-                        if (bot.getUsers()[i].username == command.slice(1)){
+                    for (var i=0; i<users.length; i++){
+                        if (users[i].username == command.slice(1)){
                             var params = { 
                                 text: qualifier,
                                 from: 'en',
-                                to: bot.getUsers()[i].language
+                                to: users[i].language
                             };
-                            if (languageCodes.indexOf(bot.getUsers()[i].language) > -1 && bot.getUsers()[i].language != 'en'){
+                            if (languageCodes.indexOf(users[i].language) > -1 && users[i].language != 'en'){
                                 client.initialize_token(function(keys){ 
                                     client.translate(params, function(err, data){
                                         bot.chat(command + " " + data);
