@@ -1,0 +1,26 @@
+{
+  "name": "plugbotapi",
+  "description": "An API for creating bots on plug.dj",
+  "version": "0.1.3",
+  "keywords": ["plug.dj", "plug"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/atomjack/plugbotapi.git"
+  },
+  "author": "Chris Bellew <atomjack@gmail.com>",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies" : {
+		"phantom": "*",
+		"plug-dj-login": "*",
+		"net": "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {
+  }
+}
