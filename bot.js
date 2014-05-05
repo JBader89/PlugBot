@@ -135,7 +135,7 @@ PlugBotAPI.getAuth({
                 bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .track, .translate, and .wiki");
                 break;
             case ".modcommands": //Returns a list of the most important commands
-                bot.chat("List of Mod Commands: .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .skipoff, .skipon, .untranslate, .warn, and .woot");
+                bot.chat("List of Mod Commands: .autoskip, .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .unskip, .untranslate, .warn, and .woot");
                 break;
             case ".hey": //Makes the bot greet the user 
             case ".yo":
@@ -882,8 +882,7 @@ PlugBotAPI.getAuth({
                     bot.chat("Try .google followed by something to look up.");
                 }
                 break;    
-            case ".skipon": //Turns auto-skip on
-            case ".warnon":
+            case ".autoskip": //Turns auto-skip on
                 for (var i=0; i<staff.length; i++){
                     if (staff[i].username == data.from && staff[i].permission > 1){
                         setmehs = true;
@@ -891,8 +890,7 @@ PlugBotAPI.getAuth({
                     }
                 }
                 break;
-            case ".skipoff": //Turns auto-skip off
-            case ".warnoff":
+            case ".unskip": //Turns auto-skip off
                 for (var i=0; i<staff.length; i++){
                     if (staff[i].username == data.from && staff[i].permission > 1){
                         setmehs = false;
