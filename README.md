@@ -33,7 +33,6 @@ Mod Only Commands
 **.autotranslate** - Autotranslates a given user with **.autotranslate [givenUser]**.  
 **.banuser** - Bans a user from the room permanently with **.banuser [givenUser]**.  
 **.front** - Moves a user to the front of the waitlist with **.front [givenUser]**.  
-**.grab** - Makes the bot grab the current song.  
 **.join** - Makes the bot join the waitlist.  
 **.leave** - Makes the bot leave the waitlist.  
 **.meh** - Makes the bot cast a downvote.  
