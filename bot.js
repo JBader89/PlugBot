@@ -28,6 +28,7 @@ var client = new MsTranslator({client_id:"PlugBot", client_secret: "uScbNIl2RHW1
 var translateList = [];
 
 var request = require('request'); //Use 'npm install request'
+var time = require('time'); //Use 'npm install time'
 
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
@@ -147,7 +148,7 @@ PlugBotAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
-                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .track, .translate, and .wiki");
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .time, .track, .translate, and .wiki");
                 break;
             case ".modcommands": //Returns a list of the most important commands
                 bot.chat("List of Mod Commands: .autoskip, .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .unskip, .untranslate, .warn, and .woot");
@@ -700,7 +701,6 @@ PlugBotAPI.getAuth({
                 }
                 else{
                     google_geocoding.geocode(qualifier, function(err, location) {
-                        console.log(location);
                         if (location!=null){
                             weather.getWeather(location.lat, location.lng, function(err, data){
                                 if (data!=null){
@@ -755,6 +755,57 @@ PlugBotAPI.getAuth({
                         }
                         else{
                             bot.chat("No temperature found.");
+                        }
+                    });
+                }
+                break;
+            case ".time": //Returns the current time in a given city with .time [givenCity], givenState]
+                if (qualifier==""){
+                    bot.chat("Try .time followed by a place to look up.");
+                }
+                else{
+                    google_geocoding.geocode(qualifier, function(err, location) {
+                        if (location!=null){
+                            var link = 'http://api.geonames.org/findNearbyPlaceNameJSON?lat=' + location.lat + '&lng=' + location.lng + '&username=jbader89&style=full'
+                            request(link, function (error, response, body) {
+                                if (!error && response.statusCode == 200) {
+                                    var info = JSON.parse(body);
+                                    if (info != undefined){
+                                        var timezone = info.geonames[0].timezone.timeZoneId;
+                                        var currentTime = new time.Date();
+                                        currentTime.setTimezone(timezone);
+                                        var ampm = "";
+                                        var hours = "";
+                                        var mins = currentTime.toString().split(' ')[4].substring(2,5);
+                                        if (currentTime.toString().split(' ')[4].substring(0,2) == "00"){
+                                            hours = "12";
+                                            ampm = "AM";
+                                        }
+                                        else if (Number(currentTime.toString().split(' ')[4].substring(0,2)) < 13){
+                                            hours = currentTime.toString().split(' ')[4].substring(0,2);
+                                            ampm = "AM";
+                                            if (hours[0]=="0"){
+                                                hours = hours[1];
+                                            }
+                                            else if (hours=="12"){
+                                                ampm = "PM";
+                                            }
+                                        }
+                                        else{
+                                            hours = String(Number(currentTime.toString().split(' ')[4].substring(0,2)) - 12);
+                                            ampm = "PM";
+                                        }
+                                        var stateOrCity = '';
+                                        if (info.geonames[0].adminName1 != ''){
+                                            stateOrCity = info.geonames[0].adminName1 + ", ";
+                                        }
+                                        bot.chat("Current time in " + stateOrCity + info.geonames[0].countryName + ": " + hours + mins + " " + ampm);
+                                    }
+                                }
+                            });
+                        }
+                        else{
+                            bot.chat("No time found.");
                         }
                     });
                 }

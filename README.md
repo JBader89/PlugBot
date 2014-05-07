@@ -23,6 +23,7 @@ General Commands
 **.similar** - Returns similar artists of the current artist, **.similar [givenArtist]** returns similar artists of a given artist.  
 **.soundcloud** - Returns the current artist's SC page, **.soundcloud [givenArtist]** returns a given artist's SC page.  
 **.temp** - Returns the current temperature in given city with **.temp [givenCity], [givenState]**.  
+**.time** - Returns the current time in a given city with **.time [givenCity], givenState]**.  
 **.track** - Returns Last.fm info about the current song.  
 **.translate** - Returns a translation of given words with **.translate [givenWords] '([language])'**, English by default.  
 **.wiki** - Returns Wikipedia article summary of a given query with **.wiki [givenQuery]**.  
