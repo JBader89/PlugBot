@@ -78,6 +78,21 @@ PlugBotAPI.getAuth({
         });
     });
 
+    //Event which triggers when the DJ history updates
+    bot.on('historyUpdate', function(data) {
+        if (dj.username == media.author){
+            var link = 'http://api.soundcloud.com/users.json?q=' + media.author + '&consumer_key=apigee';
+            request(link, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    var info = JSON.parse(body);
+                    if (info[0] != undefined){
+                        bot.chat(info[0].username + ": " + info[0].permalink_url);
+                    }
+                }
+            });
+        }
+    });
+
     //Event which triggers when waitlist changes
     bot.on('waitListUpdate', function(data) {
         bot.getWaitList(function(currentWaitlist) { 
@@ -109,12 +124,12 @@ PlugBotAPI.getAuth({
     });
 
     //Events which trigger to reconnect the bot when an error occurs
-    // var reconnect = function() { 
-    //     bot.connect(ROOM);
-    // };
+    var reconnect = function() { 
+        bot.connect(ROOM);
+    };
 
-    // bot.on('close', reconnect);
-    // bot.on('error', reconnect);
+    bot.on('close', reconnect);
+    bot.on('error', reconnect);
 
     //Event which triggers when anyone chats
     bot.on('chat', function(data) {
@@ -510,8 +525,8 @@ PlugBotAPI.getAuth({
                             bot.chat(info[0].username + ": " + info[0].permalink_url);
                         }
                         else{
-                             bot.chat("No soundcloud found.");
-                         }
+                            bot.chat("No soundcloud found.");
+                        }
                     }
                 });
                 break;
@@ -685,6 +700,7 @@ PlugBotAPI.getAuth({
                 }
                 else{
                     google_geocoding.geocode(qualifier, function(err, location) {
+                        console.log(location);
                         if (location!=null){
                             weather.getWeather(location.lat, location.lng, function(err, data){
                                 if (data!=null){
