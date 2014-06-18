@@ -2,12 +2,18 @@
   "name": "plugbotapi",
   "description": "An API for creating bots on plug.dj",
   "version": "0.1.3",
-  "keywords": ["plug.dj", "plug"],
+  "keywords": [
+    "plug.dj",
+    "plug"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/atomjack/plugbotapi.git"
   },
-  "author": "Chris Bellew <atomjack@gmail.com>",
+  "author": {
+    "name": "Chris Bellew",
+    "email": "atomjack@gmail.com"
+  },
   "main": "index.js",
   "directories": {
     "lib": "lib"
@@ -15,12 +21,22 @@
   "engines": {
     "node": "*"
   },
-  "dependencies" : {
-		"phantom": "*",
-		"plug-dj-login": "*",
-		"net": "*"
+  "dependencies": {
+    "phantom": "*",
+    "plug-dj-login": "*",
+    "net": "*"
   },
   "devDependencies": {},
-  "optionalDependencies": {
-  }
+  "optionalDependencies": {},
+  "readme": "plugbotapi\n=======\n\nAn API for creating bots on plug.dj\n\n\n## Installation\nThis API requires phantomjs version 2.0 or greater. The websockets stack in 1.9 and lower does not cooperate with plug.dj, therefore 2.0 MUST be used.\n\nYou can find information on how to compile and install 2.0 here: https://groups.google.com/forum/#!msg/phantomjs/iYyH6hF_xoQ/fTmVD8-NcFIJ\n\n```\nnpm install plugbotapi\n```\n\n## How to use\n\n```\nvar PlugBotAPI = require('plugbotapi');\n \nPlugBotAPI.getAuth({\n  username: 'xxxx', // twitter username\n  password: 'xxxx' // twitter password\n}, function(err, auth) {\n \n  var plugbotapi = new PlugBotAPI(auth);\n  var room = 'some-room';\n\n \n \n  plugbotapi.connect(room);\n   \n  plugbotapi.on('roomJoin', function() {\n    console.log(\"Connected!\");\n\n    plugbotapi.chat('Hello World');\n    \n    plugbotapi.getUsers(function(users) {\n      console.log(\"Number of users in the room: \" + users.length);\n    });\n    \n    plugbotapi.hasPermission('52a648c496fba57878e8f809', 'API.ROLE.NONE', function(result) {\n      console.log(\"permission: \", result);\n    });\n  });\n   \n  // A few sample events\n  plugbotapi.on('chat', function(data) {\n    console.log(\"got chat: \", data);\n  });\n   \n  plugbotapi.on('djAdvance', function(data) {\n    console.log(\"dj advance: \", data);\n  });\n   \n  plugbotapi.on('voteUpdate', function(data) {\n    console.log(\"vote update: \", data);\n  });\n});\n```\n\n### Events\nPlugBotAPI emits the following events. For documentation please refer to the official [Plug.dj API](http://support.plug.dj/hc/en-us/articles/201687377-Documentation#chat).\n\n* chat\n* userSkip\n* userJoin\n* userLeave\n* userFan\n* friendJoin\n* fanJoin\n* voteUpdate\n* curateUpdate\n* roomScoreUpdate\n* djAdvance\n* djUpdate\n* waitListUpdate\n* voteSkip\n* modSkip\n* chatCommand\n* historyUpdate\n\nAlso emitted is the following:\n\n* roomJoin: emitted when the bot has completed joining the room and is ready to send actions/receive events.\n* invalidLogin: emitted when the bot is unable to login, possibly due to an invalid auth cookie.\n\n## Actions\n\nAll data returned by actions is returned inside the callback that must be specified.\n\n### connect: (roomName)\n\nConnects to plug.dj and joins the specified room.\n\n### chat: (message, callback)\n\nSends _message_ in chat.\n\n### getUsers: (callback)\n\nReturns (in the callback) an array of user objects for every user in the room.\n\n### getWaitList: (callback)\n\nReturns an Array of user objects of users currently on the wait list.\n\n### getUser: (userid, callback)\n\nReturns the user object of a specific user. If you do not pass a userID, it returns the user object of the bot.\n\n### getDJ: (callback)\n\nReturns a user object of the current DJ. If there is no DJ, returns undefined.\n\n### getAudience: (callback)\n\nReturns an Array of user objects of all the users in the audience (not including the DJ).\n\n### getStaff: (callback)\n\nReturns an Array of user objects of the room's staff members that are currently in the room.\n\n### getAdmins: (callback)\n\nReturns an Array of user objects of the Admins currently in the room.\n\n### getAmbassadors: (callback)\n\nReturns an Array of user objects of the Ambassadors currently in the room.\n\n### getHost: (callback)\n\nReturns the user object of the room host if they are currently in the room, undefined otherwise.\n\n### getMedia: (callback)\n\nReturns the media object of the current playing media.\n\n### getRoomScore: (callback)\n\nReturns a room score object with the properties positive, negative, curates, and score.\n\n### getHistory: (callback)\n\nReturns an Array of history objects of the Room History (once it's been loaded).\n\n### hasPermission: (userid, role, callback)\n\nReturns a Boolean whether the userID passed has permission of the passed role. If you pass undefined or null for userID, it checks the permission of the logged in user. Pass an API.ROLE constant:\n\n* API.ROLE.NONE\n* API.ROLE.RESIDENTDJ\n* API.ROLE.BOUNCER\n* API.ROLE.MANAGER\n* API.ROLE.COHOST\n* API.ROLE.HOST\n* API.ROLE.AMBASSADOR\n* API.ROLE.ADMIN\n\n### djJoin: (callback)\n\nJoins the booth or the wait list if the booth is full.\n\n### djLeave: (callback)\n\nLeaves the booth or wait list.\n\n### getWaitListPosition: (userid, callback)\n\nIf the userID is in the wait list, it returns their position (0 index - so 0 means first position). Returns -1 if they're not in the wait list. If you do not pass a userID, it uses the logged in user ID.\n\n### setStatus: (value, callback)\n\nSets the user status (Available, AFK, Working, Sleeping). Pass an API.STATUS constant:\n\n* API.STATUS.AVAILABLE\n* API.STATUS.AFK\n* API.STATUS.WORKING\n* API.STATUS.GAMING\n\nExample:\n\n```\nplugbotapi.moderateBanUser('xxxxx', plugbotapi.API.STATUS.GAMING, function() {\n// Done\n});\n```\n\n### getNextMedia: (callback)\n\nReturns the user's queued up media. This is an object with two properties, media and inHistory. media is the media object and inHistory is a Boolean if the media is in the room history.\n\n### getTimeElapsed: (callback)\n\nReturns how much time has elapsed for the currently playing media. If there is no media, it will return 0.\n\n### getTimeRemaining: (callback)\n\nReturns how much time is remaining for the currently playing media. If there is no media, it will return 0.\n\n### moderateForceSkip: (callback)\n\nForce skip the current DJ.\n\n### moderateAddDJ: (userid, callback)\n\nAdds a user to the dj booth or wait list by passing that user's id. Users who do not have an active playlist with one item in it cannot be added.\n\n### moderateRemoveDJ: (userid, callback)\n\nRemoves a DJ from the booth or wait list by passing that user's id.\n\n### moderateBanUser: (userid, [duration], [callback])\n\nBans a user from the room. If the bot is only a bouncer, permanent bans are not available. Specify the duration with one of the following constants:\n\n* API.BAN.HOUR\n* API.BAN.DAY\n* API.BAN.PERMA\n\nIf you do not specify a duration, a permanent ban will be the default unless the bot is a bouncer, in which case the ban will be for an hour.\n\nExample:\n\n```\nplugbotapi.moderateBanUser('xxxxx', plugbotapi.API.BAN.DAY, function() {\n// Done\n});\n```\n\n### moderateUnbanUser: (userid, callback)\n\nIf the bot is a manager, unbans a user.\n\n### moderateDeleteChat: (chatid, callback)\n\nDelete a chat message by its chatid.\n\n### moderateSetRole: (userid, permission, callback)\n\nIf the bot is a manager or above, this sets another user's role. Use one of the following constants:\n\n* API.ROLE.NONE\n* API.ROLE.RESIDENTDJ\n* API.ROLE.BOUNCER\n* API.ROLE.MANAGER\n* API.ROLE.COHOST\n\nExample:\n```\nplugbotapi.moderateSetRole('xxxx', plugbotapi.API.ROLE.RESIDENTDJ);\n```\n\n### moderateMoveDJ: (userid, position, callback)\n\nIf the bot is a manager or above, move the specified user in the waitlist. Pass position 1 for the top of the list.\n\n### moderateLockWaitList: (locked, removeAll, callback)\n\nIf the bot is a manager, lock/unlock the waitlist.\n\n### woot: ()\n\nMakes the bot woot the currently playing track. NOTE:There is no way to woot via the official Plug API, so this is and `meh` are sort of a hack - they appear to sporadically stop working.\n\n### meh: ()\n\nMAkes the bot meh the currently playing track. Same note as woot applies.\n\n\n## Running multiple bots\n\nIf you want to run more than one bot at a time, you will have to specify an alternate port for phantomjs to run on for each bot (except for one, which will use the default of 12300):\n\n```\nvar PlugBotAPI = require('./plugbotapi');\nvar plugbotapi = new PlugBotAPI(h);\nplugbotapi.setPhantomPort(12301);\n```\n\n## Debugging\n\nIf you run into problems and would like some more visibility into what the virtual browser is doing, try this:\n\n```\n//plugbotapi.debug.SHOWAPI = false; // set this to false to hide the official Plug API events and actions that the virtual browser is sending and receiving. (default true)\n//plugbotapi.debug.SHOWOTHER = false; // set this to false to hide any other messages the virtual browser is logging to its console. (default true)\n\n// The API emits the 'debug' event:\nplugbotapi.on('debug', function(text) {\n    console.log(text);\n});\n```\n\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/atomjack/plugbotapi/issues"
+  },
+  "homepage": "https://github.com/atomjack/plugbotapi",
+  "_id": "plugbotapi@0.1.3",
+  "dist": {
+    "shasum": "437a94ce30afc18d3ae22759e80101dcc7ea1efb"
+  },
+  "_from": "plugbotapi"
 }

@@ -5,7 +5,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ567'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -33,14 +33,14 @@ var time = require('time'); //Use 'npm install time'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ567'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
         return;
     }
     var bot = new PlugBotAPI(auth);
-    var ROOM = 'terminally-chillin'; //Enter your room name
+    var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
@@ -124,14 +124,6 @@ PlugBotAPI.getAuth({
         });
     });
 
-    //Events which trigger to reconnect the bot when an error occurs
-    var reconnect = function() { 
-        bot.connect(ROOM);
-    };
-
-    bot.on('close', reconnect);
-    bot.on('error', reconnect);
-
     //Event which triggers when anyone chats
     bot.on('chat', function(data) {
         var command=data.message.split(' ')[0];
@@ -156,7 +148,6 @@ PlugBotAPI.getAuth({
             case ".hey": //Makes the bot greet the user 
             case ".yo":
             case ".hi":
-            case ".hello":
             case ".bot":
                 bot.chat("Well hey there! @"+data.from);
                 break;
@@ -271,6 +262,47 @@ PlugBotAPI.getAuth({
                 break;
             case ".highfive":
                 bot.chat("http://i.imgur.com/KevhNWt.gif");
+                break;
+            case ".justdoit":
+                bot.chat("http://i.imgur.com/W8GgWzh.gif");
+                break;
+            case ".timeforwork":
+                bot.chat("http://i.imgur.com/LqU7LPl.gif");
+                break;
+            case ".saul":
+                bot.chat("http://i.imgur.com/URNSlqT.gif");
+                break;
+            case ".smh":
+            case ".no":
+                bot.chat("http://i.imgur.com/93j8cA1.gif");
+                break;
+            case ".touche":
+                bot.chat("http://replygif.net/i/1108.gif");
+                break;
+            case ".holyshit":
+            case ".ohsnap":
+                bot.chat("http://i.imgur.com/Qtcjvi4.gif");
+                break;
+            case ".feels":
+                bot.chat("http://i.imgur.com/axsIhkT.gif");
+                break;
+            case ".pleasestop":
+                bot.chat("http://i.imgur.com/QHfqz3L.gif");
+                break;
+            case ".yeah!":
+                bot.chat("http://i.imgur.com/jmw4OLz.gif");
+                break;
+            case ".jesse":
+                bot.chat("http://i.imgur.com/34qU4qC.gif");
+                break;
+            case ".dontmove":
+                bot.chat("http://i.imgur.com/bzGFChQ.gif");
+                break;
+            case ".hello":
+                bot.chat("http://cdn.makeagif.com/media/8-12-2013/R7sSHU.gif");
+                break;
+            case ".boom":
+                bot.chat("http://i.imgur.com/tKd5J2x.gif");
                 break;
             case ".eggsfortheprettylady":
                 bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
@@ -1030,6 +1062,12 @@ PlugBotAPI.getAuth({
                         }
                     }
                 }
+                // bot.getMedia(function(currentMedia) { 
+                //     media = currentMedia; 
+                // });
+                // bot.getDJ(function(currentDJ) { 
+                //     dj = currentDJ; 
+                // });
                 break;
         }
     });
