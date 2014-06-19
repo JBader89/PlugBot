@@ -82,7 +82,13 @@ PlugBotAPI.getAuth({
     //Event which triggers when the DJ history updates
     bot.on('historyUpdate', function(data) {
         var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
-        if (dj.username.toLowerCase() == media.author.toLowerCase() || dj.username.toLowerCase() == noSpaceName){
+        var wordCheck = false;
+        for (var i in media.author.toLowerCase().split(' ')){
+            if (dj.username.toLowerCase().indexOf(i) > -1){
+                wordCheck = true;
+            }
+        }
+        if (dj.username.toLowerCase() == media.author.toLowerCase() || dj.username.toLowerCase() == noSpaceName || wordCheck){
             var link = 'http://api.soundcloud.com/users.json?q=' + media.author + '&consumer_key=apigee';
             request(link, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
