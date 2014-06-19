@@ -5,7 +5,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ567'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -33,7 +33,7 @@ var time = require('time'); //Use 'npm install time'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ567'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -81,7 +81,8 @@ PlugBotAPI.getAuth({
 
     //Event which triggers when the DJ history updates
     bot.on('historyUpdate', function(data) {
-        if (dj.username == media.author){
+        var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
+        if (dj.username.toLowerCase() == media.author.toLowerCase() || dj.username.toLowerCase() == noSpaceName){
             var link = 'http://api.soundcloud.com/users.json?q=' + media.author + '&consumer_key=apigee';
             request(link, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
