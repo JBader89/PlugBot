@@ -40,7 +40,7 @@ PlugBotAPI.getAuth({
         return;
     }
     var bot = new PlugBotAPI(auth);
-    var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+    var ROOM = 'terminally-chillin'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
@@ -83,8 +83,8 @@ PlugBotAPI.getAuth({
     bot.on('historyUpdate', function(data) {
         var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
         var wordCheck = false;
-        for (var i in media.author.toLowerCase().split(' ')){
-            if (dj.username.toLowerCase().indexOf(i) > -1){
+        for (var i=0; i < media.author.toLowerCase().split(' ').length; i++){
+            if (dj.username.toLowerCase().indexOf(media.author.toLowerCase().split(' ')[i]) > -1){
                 wordCheck = true;
             }
         }
@@ -310,6 +310,14 @@ PlugBotAPI.getAuth({
                 break;
             case ".boom":
                 bot.chat("http://i.imgur.com/tKd5J2x.gif");
+                break;
+            case ".what":
+                bot.chat("http://i.imgur.com/RcNHW.gif");
+                break;
+            case ".argh":
+            case ".pizza":
+            case ".gahhh":
+                bot.chat("http://i53.tinypic.com/24ep2xc.gif");
                 break;
             case ".eggsfortheprettylady":
                 bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
