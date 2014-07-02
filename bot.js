@@ -5,7 +5,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ567'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -33,14 +33,14 @@ var time = require('time'); //Use 'npm install time'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'xxx'
+    password: 'rahtZ567'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
         return;
     }
     var bot = new PlugBotAPI(auth);
-    var ROOM = 'terminally-chillin'; //Enter your room name
+    var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
@@ -83,11 +83,14 @@ PlugBotAPI.getAuth({
     bot.on('historyUpdate', function(data) {
         var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
         var wordCheck = false;
-        for (var i=0; i < media.author.toLowerCase().split(' ').length; i++){
-            if (dj.username.toLowerCase().indexOf(media.author.toLowerCase().split(' ')[i]) > -1){
+        var authorWords = media.author.toLowerCase().split(' ');
+        for (var i=0; i < authorWords.length; i++){
+            //console.log(authorWords[i]);
+            if (dj.username.toLowerCase().indexOf(authorWords[i]) > -1 && authorWords[i] != " "){
                 wordCheck = true;
             }
         }
+        //console.log("No Space Name: " + noSpaceName + ", Word Check: " + wordCheck + ", Author: " + dj.username.toLowerCase());
         if (dj.username.toLowerCase() == media.author.toLowerCase() || dj.username.toLowerCase() == noSpaceName || wordCheck){
             var link = 'http://api.soundcloud.com/users.json?q=' + media.author + '&consumer_key=apigee';
             request(link, function (error, response, body) {
