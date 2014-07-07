@@ -26,6 +26,7 @@ General Commands
 **.time** - Returns the current time in a given city with **.time [givenCity], givenState]**.  
 **.track** - Returns Last.fm info about the current song.  
 **.translate** - Returns a translation of given words with **.translate [givenWords] '([language])'**, English by default.  
+**.twitter** - Returns a link to the Chillout Mixer Twitter page.  
 **.wiki** - Returns Wikipedia article summary of a given query with **.wiki [givenQuery]**.  
 
 Mod Only Commands

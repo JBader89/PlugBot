@@ -5,7 +5,7 @@ var lastfm = new Lastfm({ //Get own last.fm account with api_key, api_secret, us
     api_key: 'd657909b19fde5ac1491b756b6869d38',
     api_secret: '571e2972ae56bd9c1c6408f13696f1f3',
     username: 'BaderBombs',
-    password: 'rahtZ567'
+    password: 'xxx'
 });
 
 var LastfmAPI = require('lastfmapi');
@@ -33,7 +33,7 @@ var time = require('time'); //Use 'npm install time'
 // Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugBotAPI.getAuth({
     username: 'BaderBombs',
-    password: 'rahtZ567'
+    password: 'xxx'
 }, function(err, auth) { 
     if(err) {
         console.log("An error occurred: " + err);
@@ -150,7 +150,7 @@ PlugBotAPI.getAuth({
         switch (command)
         {
             case ".commands": //Returns a list of the most important commands
-                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .time, .track, .translate, and .wiki");
+                bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .time, .track, .translate, .twitter, and .wiki");
                 break;
             case ".modcommands": //Returns a list of the most important commands
                 bot.chat("List of Mod Commands: .autoskip, .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .unskip, .untranslate, .warn, and .woot");
@@ -266,6 +266,9 @@ PlugBotAPI.getAuth({
             case ".fb":
             case ".facebook": //Returns a link to the Chillout Mixer Facebook page
                 bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
+                break;
+            case ".twitter": //Returns a link to the Chillout Mixer Twitter page
+                bot.chat("Follow us on Twitter: https://www.twitter.com/ChilloutMixer");
                 break;
             case ".damnright": //Commands just for fun
                 bot.chat("http://i.imgur.com/5Liksxa.gif");
