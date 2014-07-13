@@ -40,7 +40,7 @@ PlugBotAPI.getAuth({
         return;
     }
     var bot = new PlugBotAPI(auth);
-    var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
+    var ROOM = 'terminally-chillin'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
@@ -86,7 +86,7 @@ PlugBotAPI.getAuth({
         var authorWords = media.author.toLowerCase().split(' ');
         for (var i=0; i < authorWords.length; i++){
             //console.log(authorWords[i]);
-            if (dj.username.toLowerCase().indexOf(authorWords[i]) > -1 && authorWords[i] != " "){
+            if (dj.username.toLowerCase().indexOf(authorWords[i]) > -1 && authorWords[i].match(/[a-zA-Z]/g)){
                 wordCheck = true;
             }
         }
