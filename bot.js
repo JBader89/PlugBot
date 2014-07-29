@@ -40,7 +40,7 @@ PlugBotAPI.getAuth({
         return;
     }
     var bot = new PlugBotAPI(auth);
-    var ROOM = 'terminally-chillin'; //Enter your room name
+    var ROOM = 'chillout-mixer-ambient-triphop'; //Enter your room name
     bot.connect(ROOM);
 
     //Event which triggers when the bot joins the room
@@ -77,6 +77,8 @@ PlugBotAPI.getAuth({
         bot.getDJ(function(currentDJ) { 
             dj = currentDJ; 
         });
+        //bot.chat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.curates + " :thumbsdown: " + data.lastPlay.score.negative);
+        //bot.chat(":musical_note: " + data.dj.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
     });
 
     //Event which triggers when the DJ history updates
@@ -113,6 +115,7 @@ PlugBotAPI.getAuth({
 
     //Event which triggers with a user joins the room
     bot.on('userJoin', function(data) {
+        //console.log(data);
         bot.getStaff(function(currentStaff) { 
             staff = currentStaff; 
         });
