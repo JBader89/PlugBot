@@ -1,7 +1,7 @@
 var PlugAPI = require('plugapi'); //Use 'npm install plugbotapi'
 
 var bot = new PlugAPI({
-    "email": "jbades6310@gmail.com",
+    "email": "jbader@conncoll.edu",
     "password": "xxx"
 });
 var ROOM = 'terminally-chillin';
@@ -62,7 +62,6 @@ bot.on('roomJoin', function(data) {
 
 //Event which triggers when new DJ starts playing a song
 bot.on('advance', function(data) {
-    console.log("advance");
     media = bot.getMedia();
     dj = bot.getDJ();
     //bot.sendChat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.curates + " :thumbsdown: " + data.lastPlay.score.negative);
@@ -292,6 +291,7 @@ bot.on('chat', function(data) {
         case ".pleasestop":
             bot.sendChat("http://i.imgur.com/QHfqz3L.gif");
             break;
+        case ".yeah":
         case ".yeah!":
             bot.sendChat("http://i.imgur.com/jmw4OLz.gif");
             break;
