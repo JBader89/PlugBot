@@ -4,7 +4,7 @@ var bot = new PlugAPI({
     "email": "jbader@conncoll.edu",
     "password": "xxx"
 });
-var ROOM = 'terminally-chillin';
+var ROOM = 'chillout-mixer-ambient-triphop';
 bot.connect(ROOM); // The part after https://plug.dj
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
