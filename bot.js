@@ -96,8 +96,15 @@ bot.on('djListUpdate', function(data) {
     waitlist = bot.getWaitList();
 });
 
-//Event which triggers when song is skipped
+//Event which triggers when user skips his song
 bot.on('skip', function(data) {
+    media = bot.getMedia();
+    dj = bot.getDJ();
+    waitlist = bot.getWaitList();
+});
+
+//Event which triggers when a mod skips the song
+bot.on('modSkip', function(data) {
     media = bot.getMedia();
     dj = bot.getDJ();
     waitlist = bot.getWaitList();
@@ -582,9 +589,10 @@ bot.on('chat', function(data) {
             for (var i=0; i<staff.length; i++){
                 if (staff[i].username == data.from && staff[i].role > 1){
                     bot.getPlaylists(function(playlists) {
+                        console.log(playlists);
                         for (var i=0; i<playlists.length; i++){
-                            if (playlists[i].selected){
-                                if (playlists[i].items.length!=200){
+                            if (playlists[i].active){
+                                if (playlists[i].count!=200){
                                     var selectedID=playlists[i].id;
                                     bot.sendChat("Added to my "+playlists[i].name+" playlist.");
                                 }
