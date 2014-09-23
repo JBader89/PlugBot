@@ -1,4 +1,4 @@
-var PlugAPI = require('plugapi'); //Use 'npm install plugbotapi'
+var PlugAPI = require('plugapi'); //Use 'git clone git@github.com:plugCubed/plugAPI.git' in your node_modules
 
 var bot = new PlugAPI({
     "email": "jbader@conncoll.edu",
@@ -44,13 +44,14 @@ var reconnect = function() {
 bot.on('close', reconnect);
 bot.on('error', reconnect);
 
-//Event which triggers when the bot joins the room
 var media = null;
 var waitlist = null;
 var dj = null;
 var staff = null;
 var users = null;
 var roomScore = null;
+
+//Event which triggers when the bot joins the room
 bot.on('roomJoin', function(data) {
     media = bot.getMedia();
     waitlist = bot.getWaitList();
@@ -64,17 +65,7 @@ bot.on('roomJoin', function(data) {
 bot.on('advance', function(data) {
     media = bot.getMedia();
     dj = bot.getDJ();
-    //bot.sendChat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.curates + " :thumbsdown: " + data.lastPlay.score.negative);
-    //bot.sendChat(":musical_note: " + data.dj.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
-});
-
-bot.on('floodChat', function(data) {
-    bot.sendChat("flood!");
-});
-
-//Event which triggers when the DJ history updates
-bot.on('historyUpdate', function(data) {
-    console.log("b");
+    waitlist = bot.getWaitList();
     var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
     var wordCheck = false;
     var authorWords = media.author.toLowerCase().split(' ');
@@ -96,12 +87,25 @@ bot.on('historyUpdate', function(data) {
             }
         });
     }
+    //bot.sendChat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.curates + " :thumbsdown: " + data.lastPlay.score.negative);
+    //bot.sendChat(":musical_note: " + data.dj.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
 });
 
-//Event which triggers when waitlist changes
-bot.on('waitListUpdate', function(data) {
-    console.log("c");
+//Event which triggers when the waitlist changes
+bot.on('djListUpdate', function(data) {
     waitlist = bot.getWaitList();
+});
+
+//Event which triggers when song is skipped
+bot.on('skip', function(data) {
+    media = bot.getMedia();
+    dj = bot.getDJ();
+    waitlist = bot.getWaitList();
+});
+
+//Still figuring out how this works
+bot.on('floodChat', function(data) {
+    bot.sendChat("flood!");
 });
 
 //Event which triggers with a user joins the room
@@ -114,8 +118,7 @@ bot.on('userJoin', function(data) {
 //Event which triggers when the current song receives 5 mehs, skips the song
 var setmehs = false;
 var mehs = 4;
-bot.on('voteUpdate', function(data) {
-    console.log("d");
+bot.on('vote', function(data) {
     roomScore = bot.getRoomScore();
     if (roomScore.negative > mehs && setmehs){
         bot.sendChat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
@@ -225,7 +228,7 @@ bot.on('chat', function(data) {
         case ".join": //Makes the bot join the waitlist
             for (var i=0; i<staff.length; i++){
                 if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.djJoin();
+                    bot.joinBooth();
                     bot.sendChat("Joining waitlist!");
                 }
             }
@@ -233,7 +236,7 @@ bot.on('chat', function(data) {
         case ".leave": //Makes the bot leave the waitlist
             for (var i=0; i<staff.length; i++){
                 if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.djLeave();
+                    bot.leaveBooth();
                     bot.sendChat("Leaving waitlist.");
                 }
             }
@@ -575,30 +578,29 @@ bot.on('chat', function(data) {
             });
             break;
 
-        //Currently not feasible with the new plug.dj API
-        // case ".grab": //Makes the bot grab the current song
-        //     for (var i=0; i<staff.length; i++){
-        //         if (staff[i].username == data.from && staff[i].role > 1){
-        //             bot.getPlaylists(function(playlists) {
-        //                 for (var i=0; i<playlists.length; i++){
-        //                     if (playlists[i].selected){
-        //                         if (playlists[i].items.length!=200){
-        //                             var selectedID=playlists[i].id;
-        //                             bot.sendChat("Added to my "+playlists[i].name+" playlist.");
-        //                         }
-        //                         else{
-        //                             bot.createPlaylist("Library "+playlists.length+1);
-        //                             bot.activatePlaylist(playlists[playlists.length-1].id);
-        //                             var selectedID=playlists[playlists.length-1].id;
-        //                             bot.sendChat("Added to "+playlists[playlists.length-1].name+" playlist.");
-        //                         }
-        //                     }
-        //                 }
-        //                 bot.addSongToPlaylist(selectedID, media.id);
-        //             });
-        //         }
-        //     }
-        //     break;
+        case ".grab": //Makes the bot grab the current song
+            for (var i=0; i<staff.length; i++){
+                if (staff[i].username == data.from && staff[i].role > 1){
+                    bot.getPlaylists(function(playlists) {
+                        for (var i=0; i<playlists.length; i++){
+                            if (playlists[i].selected){
+                                if (playlists[i].items.length!=200){
+                                    var selectedID=playlists[i].id;
+                                    bot.sendChat("Added to my "+playlists[i].name+" playlist.");
+                                }
+                                else{
+                                    bot.createPlaylist("Library "+playlists.length+1);
+                                    bot.activatePlaylist(playlists[playlists.length-1].id);
+                                    var selectedID=playlists[playlists.length-1].id;
+                                    bot.sendChat("Added to "+playlists[playlists.length-1].name+" playlist.");
+                                }
+                            }
+                        }
+                        bot.addSongToPlaylist(selectedID, media.id);
+                    });
+                }
+            }
+            break;
 
         case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
             if (qualifier!=""){
