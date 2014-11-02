@@ -1,4 +1,4 @@
-var PlugAPI = require('plugapi'); //Use 'git clone git@github.com:plugCubed/plugAPI.git' in your node_modules
+var PlugAPI = require('plugbotapi'); //Use 'git clone git@github.com:plugCubed/plugAPI.git' in your node_modules
 
 var bot = new PlugAPI({
     "email": "jbader@conncoll.edu",
@@ -53,19 +53,35 @@ var roomScore = null;
 
 //Event which triggers when the bot joins the room
 bot.on('roomJoin', function(data) {
-    media = bot.getMedia();
-    waitlist = bot.getWaitList();
-    dj = bot.getDJ();
-    staff = bot.getStaff();
-    users = bot.getUsers();
+    bot.getMedia(function(plugMedia){
+        media = plugMedia;
+    });
+    bot.getWaitList(function(plugWaitlist){
+        waitlist = plugWaitlist;
+    });
+    bot.getDJ(function(plugDJ){
+        dj = plugDJ;
+    });
+    bot.getStaff(function(plugStaff){
+        staff = plugStaff;
+    });
+    bot.getUsers(function(plugUsers){
+        users = plugUsers;
+    });
     console.log("I'm live!");
 });
 
 //Event which triggers when new DJ starts playing a song
 bot.on('advance', function(data) {
-    media = bot.getMedia();
-    dj = bot.getDJ();
-    waitlist = bot.getWaitList();
+    bot.getMedia(function(plugMedia){
+        media = plugMedia;
+    });
+    bot.getDJ(function(plugDJ){
+        dj = plugDJ;
+    });
+    bot.getWaitList(function(plugWaitlist){
+        waitlist = plugWaitlist;
+    });
     var noSpaceName = media.author.toLowerCase().replace(/ +/g, "");
     var wordCheck = false;
     var authorWords = media.author.toLowerCase().split(' ');
@@ -82,44 +98,83 @@ bot.on('advance', function(data) {
             if (!error && response.statusCode == 200) {
                 var info = JSON.parse(body);
                 if (info[0] != undefined){
-                    bot.sendChat(info[0].username + ": " + info[0].permalink_url);
+                    bot.chat(info[0].username + ": " + info[0].permalink_url);
                 }
             }
         });
     }
-    //bot.sendChat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.curates + " :thumbsdown: " + data.lastPlay.score.negative);
-    //bot.sendChat(":musical_note: " + data.dj.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
+    // if (data.lastPlay.score != null) {
+    //     console.log(data.currentDJ.username + " " + data.media.title + " " + data.media.author);
+    //     bot.chat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.grabs + " :thumbsdown: " + data.lastPlay.score.negative);
+    //     bot.chat(":musical_note: " + data.currentDJ.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
+    // }
 });
 
 //Event which triggers when the waitlist changes
-bot.on('djListUpdate', function(data) {
-    waitlist = bot.getWaitList();
+bot.on('waitListUpdate', function(data) {
+    bot.getWaitList(function(plugWaitlist){
+        waitlist = plugWaitlist;
+    });
+    bot.getStaff(function(plugStaff){
+        staff = plugStaff;
+    });
+    bot.getUsers(function(plugUsers){
+        users = plugUsers;
+    });
 });
 
 //Event which triggers when user skips his song
 bot.on('skip', function(data) {
-    media = bot.getMedia();
-    dj = bot.getDJ();
-    waitlist = bot.getWaitList();
+    bot.getMedia(function(plugMedia){
+        media = plugMedia;
+    });
+    bot.getWaitList(function(plugWaitlist){
+        waitlist = plugWaitlist;
+    });
+    bot.getDJ(function(plugDJ){
+        dj = plugDJ;
+    });
+    bot.getStaff(function(plugStaff){
+        staff = plugStaff;
+    });
+    bot.getUsers(function(plugUsers){
+        users = plugUsers;
+    });
 });
 
 //Event which triggers when a mod skips the song
 bot.on('modSkip', function(data) {
-    media = bot.getMedia();
-    dj = bot.getDJ();
-    waitlist = bot.getWaitList();
+    bot.getMedia(function(plugMedia){
+        media = plugMedia;
+    });
+    bot.getWaitList(function(plugWaitlist){
+        waitlist = plugWaitlist;
+    });
+    bot.getDJ(function(plugDJ){
+        dj = plugDJ;
+    });
+    bot.getStaff(function(plugStaff){
+        staff = plugStaff;
+    });
+    bot.getUsers(function(plugUsers){
+        users = plugUsers;
+    });
 });
 
 //Still figuring out how this works
 bot.on('floodChat', function(data) {
-    bot.sendChat("flood!");
+    bot.chat("flood!");
 });
 
 //Event which triggers with a user joins the room
 bot.on('userJoin', function(data) {
     //console.log(data);
-    staff = bot.getStaff();
-    users = bot.getUsers();
+    bot.getStaff(function(plugStaff){
+        staff = plugStaff;
+    });
+    bot.getUsers(function(plugUsers){
+        users = plugUsers;
+    });
 });
 
 //Event which triggers when the current song receives 5 mehs, skips the song
@@ -128,7 +183,7 @@ var mehs = 4;
 bot.on('vote', function(data) {
     roomScore = bot.getRoomScore();
     if (roomScore.negative > mehs && setmehs){
-        bot.sendChat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+        bot.chat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
         bot.moderateForceSkip(dj.id);
     }
 });
@@ -149,37 +204,37 @@ bot.on('chat', function(data) {
     switch (command)
     {
         case ".commands": //Returns a list of the most important commands
-            bot.sendChat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .time, .track, .translate, .twitter, and .wiki");
+            bot.chat("List of Commands: .about, .album, .artist, .calc, .define, .events, .facebook, .forecast, .genre, .google, .github, .props, .similar, .soundcloud, .temp, .time, .track, .translate, .twitter, and .wiki");
             break;
         case ".modcommands": //Returns a list of the most important commands
-            bot.sendChat("List of Mod Commands: .autoskip, .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .unskip, .untranslate, .warn, and .woot");
+            bot.chat("List of Mod Commands: .autoskip, .autotranslate, .banuser, .front, .join, .leave, .meh, .move, .setmehs, .skip, .unskip, .untranslate, .warn, and .woot");
             break;
         case ".hey": //Makes the bot greet the user 
         case ".yo":
         case ".hi":
         case ".bot":
-            bot.sendChat("Well hey there! @"+data.from);
+            bot.chat("Well hey there! @"+data.un);
             break;
         case ".yesplay": //Gives the room criteria for acceptable genres
-            bot.sendChat("Types of music we encourage in the Chillout Mixer: Trip Hop, Ambient, Psybient, Dub, Liquid DnB, Acid Jazz, as well as some occasional instrumental chillwave/hip hop/trap when it fits. Think downtempo... soothing, relaxing electronica.");
+            bot.chat("Types of music we encourage in the Chillout Mixer: Trip Hop, Ambient, Psybient, Dub, Liquid DnB, Acid Jazz, as well as some occasional instrumental chillwave/hip hop/trap when it fits. Think downtempo... soothing, relaxing electronica.");
             break;
         case ".noplay": //Gives the room criteria for unacceptable genres
-            bot.sendChat("DO NOT PLAY: Rock genres (Indie/Post/Alt/etc), Wubs (Chillstep/Dubstep/Brostep), EDM - Dance Music (Trance/House/etc), or vocal Hip Hop/Rap/Trap. Music MUST be chill and fit the Rooms flow. Repeated failure to obey these rules may = ban.")
+            bot.chat("DO NOT PLAY: Rock genres (Indie/Post/Alt/etc), Wubs (Chillstep/Dubstep/Brostep), EDM - Dance Music (Trance/House/etc), or vocal Hip Hop/Rap/Trap. Music MUST be chill and fit the Rooms flow. Repeated failure to obey these rules may = ban.")
             break;   
         case ".warn": //Skips a user playing an off-genre song
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.sendChat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.chat("@" + dj.username + " Your tune does not fall within the established genre of the Chillout Mixer. Please type .noplay or .yesplay for more info.");
                     bot.moderateForceSkip(dj.id);
                 }
             }
             break;
         case ".banuser": //Bans a user from the room permanently with .banuser [givenUser]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     for (var j=0; j<users.length; j++){
                         if (users[j].username == qualifier){
-                            bot.moderateBanUser(users[j].id, 1, 'f');
+                            bot.moderateBanUser(users[j].id);
                         }
                     }
                 }
@@ -187,11 +242,11 @@ bot.on('chat', function(data) {
             break;
         case ".move": //Moves a user in the waitlist with .move [givenUser], [givenSpot]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1 && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1 && staff[i].role > 1){
                     for (var j=0; j<users.length; j++){
                         if (users[j].username == qualifier.split(' ')[0]){
                             if (Number(qualifier.split(' ')[1]) > waitlist.length){
-                                bot.sendChat("Sorry, there are only " + waitlist.length + " people in the waitlist, please try again.");
+                                bot.chat("Sorry, there are only " + waitlist.length + " people in the waitlist, please try again.");
                             }
                             else{
                                 bot.moderateMoveDJ(users[j].id, Number(qualifier.split(' ')[1]));
@@ -203,7 +258,7 @@ bot.on('chat', function(data) {
             break;
         case ".front": //Moves a user to the front of the waitlist with .front [givenUser]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1 && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1 && staff[i].role > 1){
                     for (var j=0; j<users.length; j++){
                         if (users[j].username == qualifier.split(' ')[0]){
                             bot.moderateMoveDJ(users[j].id, 1);
@@ -214,122 +269,122 @@ bot.on('chat', function(data) {
             break;
         case ".woot": //Makes the bot cast an upvote
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.sendChat("I can dig it!");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.chat("I can dig it!");
                     bot.woot();
                 }
             }
             break;
         case ".meh": //Makes the bot cast a downvote
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.sendChat("Please... make it stop :unamused:");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.chat("Please... make it stop :unamused:");
                     bot.meh();
                 }
             }
             break;
         case ".props": //Makes the bot give props to the user
         case ".propsicle":
-            bot.sendChat("Nice play! @"+dj.username);
+            bot.chat("Nice play! @"+dj.username);
             break;
         case ".join": //Makes the bot join the waitlist
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.joinBooth();
-                    bot.sendChat("Joining waitlist!");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.djJoin();
+                    bot.chat("Joining waitlist!");
                 }
             }
             break;
         case ".leave": //Makes the bot leave the waitlist
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.leaveBooth();
-                    bot.sendChat("Leaving waitlist.");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.djLeave();
+                    bot.chat("Leaving waitlist.");
                 }
             }
             break;
         case ".skip": //Makes the bot skip the current song
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.sendChat("Skipping!");
+                if (staff[i].username == data.un && staff[i].role > 1){
+                    bot.chat("Skipping!");
                     bot.moderateForceSkip(dj.id);
                 }
             }
             break;
         case ".github": //Returns a link to the bot's GitHub repository
-            bot.sendChat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
+            bot.chat("Check me out on GitHub! https://github.com/JBader89/PlugBot");
             break;
         case ".about": //Returns a description of the bot's purpose, creator, and usability
-            bot.sendChat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
+            bot.chat("Hey, I'm GeniusBot, your personal encyclopedic web scraper. My father, TerminallyChill, created me. For a list of my commands, type .commands");
             break;
         case ".fb":
         case ".facebook": //Returns a link to the Chillout Mixer Facebook page
-            bot.sendChat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
+            bot.chat("Like us on Facebook: https://www.facebook.com/ChilloutMixer");
             break;
         case ".twitter": //Returns a link to the Chillout Mixer Twitter page
-            bot.sendChat("Follow us on Twitter: https://www.twitter.com/ChilloutMixer");
+            bot.chat("Follow us on Twitter: https://www.twitter.com/ChilloutMixer");
             break;
         case ".damnright": //Commands just for fun
-            bot.sendChat("http://i.imgur.com/5Liksxa.gif");
+            bot.chat("http://i.imgur.com/5Liksxa.gif");
             break;
         case ".highfive":
-            bot.sendChat("http://i.imgur.com/KevhNWt.gif");
+            bot.chat("http://i.imgur.com/KevhNWt.gif");
             break;
         case ".justdoit":
-            bot.sendChat("http://i.imgur.com/W8GgWzh.gif");
+            bot.chat("http://i.imgur.com/W8GgWzh.gif");
             break;
         case ".timeforwork":
-            bot.sendChat("http://i.imgur.com/LqU7LPl.gif");
+            bot.chat("http://i.imgur.com/LqU7LPl.gif");
             break;
         case ".saul":
-            bot.sendChat("http://i.imgur.com/URNSlqT.gif");
+            bot.chat("http://i.imgur.com/URNSlqT.gif");
             break;
         case ".smh":
         case ".no":
-            bot.sendChat("http://i.imgur.com/93j8cA1.gif");
+            bot.chat("http://i.imgur.com/93j8cA1.gif");
             break;
         case ".touche":
-            bot.sendChat("http://replygif.net/i/1108.gif");
+            bot.chat("http://replygif.net/i/1108.gif");
             break;
         case ".holyshit":
         case ".ohsnap":
-            bot.sendChat("http://i.imgur.com/Qtcjvi4.gif");
+            bot.chat("http://i.imgur.com/Qtcjvi4.gif");
             break;
         case ".feels":
-            bot.sendChat("http://i.imgur.com/axsIhkT.gif");
+            bot.chat("http://i.imgur.com/axsIhkT.gif");
             break;
         case ".pleasestop":
-            bot.sendChat("http://i.imgur.com/QHfqz3L.gif");
+            bot.chat("http://i.imgur.com/QHfqz3L.gif");
             break;
         case ".yeah":
         case ".yeah!":
-            bot.sendChat("http://i.imgur.com/jmw4OLz.gif");
+            bot.chat("http://i.imgur.com/jmw4OLz.gif");
             break;
         case ".jesse":
-            bot.sendChat("http://i.imgur.com/34qU4qC.gif");
+            bot.chat("http://i.imgur.com/34qU4qC.gif");
             break;
         case ".dontmove":
-            bot.sendChat("http://i.imgur.com/bzGFChQ.gif");
+            bot.chat("http://i.imgur.com/bzGFChQ.gif");
             break;
         case ".hello":
-            bot.sendChat("http://cdn.makeagif.com/media/8-12-2013/R7sSHU.gif");
+            bot.chat("http://cdn.makeagif.com/media/8-12-2013/R7sSHU.gif");
             break;
         case ".boom":
-            bot.sendChat("http://i.imgur.com/tKd5J2x.gif");
+            bot.chat("http://i.imgur.com/tKd5J2x.gif");
             break;
         case ".what":
-            bot.sendChat("http://i.imgur.com/RcNHW.gif");
+            bot.chat("http://i.imgur.com/RcNHW.gif");
             break;
         case ".argh":
         case ".pizza":
         case ".gahhh":
-            bot.sendChat("http://i53.tinypic.com/24ep2xc.gif");
+            bot.chat("http://i53.tinypic.com/24ep2xc.gif");
             break;
         case ".eggsfortheprettylady":
-            bot.sendChat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
+            bot.chat("Wakey wakey :egg: and bakey, fo' the pretty lady @Rightclik");
             break;
         case ".pita":
-            bot.sendChat("http://chillouttent.org/p-i-t-a/");
+            bot.chat("http://chillouttent.org/p-i-t-a/");
             break;
         case ".artist": //Returns Last.fm info about the current artist, .artist [givenArtist] returns Last.fm info about a given artist
             var artistChoice="";
@@ -375,17 +430,17 @@ bot.on('chat', function(data) {
                             if (summary.length>250){
                                 summary=summary.substring(0, 247)+"...";
                             }                           
-                            bot.sendChat(summary); 
+                            bot.chat(summary); 
                             var lastfmArtist=artistChoice;
                             lastfmArtist=lastfmArtist.replace(/ /g, '+');
-                            bot.sendChat("For more info: http://www.last.fm/music/" + lastfmArtist);
+                            bot.chat("For more info: http://www.last.fm/music/" + lastfmArtist);
                         }
                         else {
-                            bot.sendChat("No artist info found.");
+                            bot.chat("No artist info found.");
                         }
                     }
                     else {
-                        bot.sendChat("No artist info found.");
+                        bot.chat("No artist info found.");
                     }
                 }
             });
@@ -410,14 +465,14 @@ bot.on('chat', function(data) {
                             if (summary.length>250){
                                 summary=summary.substring(0, 247)+"...";
                             }  
-                            bot.sendChat(summary);
+                            bot.chat(summary);
                         }
                         else {
-                            bot.sendChat("No track info found.");
+                            bot.chat("No track info found.");
                         }
                     }
                     else {
-                        bot.sendChat("No track info found.");
+                        bot.chat("No track info found.");
                     }
                 }
             });
@@ -446,18 +501,18 @@ bot.on('chat', function(data) {
                     }
                     if (qualifier==""){
                         if (tags!=""){
-                            bot.sendChat("Genre of "+trackChoice+" by "+artistChoice+": "+tags);
+                            bot.chat("Genre of "+trackChoice+" by "+artistChoice+": "+tags);
                         }
                         else{
-                            bot.sendChat("No genre found.");
+                            bot.chat("No genre found.");
                         }
                     }
                     else{
                         if (tags!=""){
-                            bot.sendChat("Genre of "+artistChoice+": "+tags);
+                            bot.chat("Genre of "+artistChoice+": "+tags);
                         }
                         else{
-                            bot.sendChat("No genre found.");
+                            bot.chat("No genre found.");
                         }
                     }
                 }
@@ -480,12 +535,12 @@ bot.on('chat', function(data) {
                                 albumMessage = albumMessage + " (" + year + ")";
                             }
                         }
-                        bot.sendChat(albumMessage);
-                        bot.sendChat("Check out the full album: " + track.album.url);
+                        bot.chat(albumMessage);
+                        bot.chat("Check out the full album: " + track.album.url);
                     });
                 }
                 else{
-                    bot.sendChat("No album found.");
+                    bot.chat("No album found.");
                 }
             });
             break;
@@ -508,10 +563,10 @@ bot.on('chat', function(data) {
                         artists = artists + similarArtists.artist[i].name + ", ";
                     }
                     artists = artists.substring(0, artists.length-2);
-                    bot.sendChat("Similar artists to " + artistChoice + ": " + artists);
+                    bot.chat("Similar artists to " + artistChoice + ": " + artists);
                 }
                 else{
-                    bot.sendChat("No similar artists found.");
+                    bot.chat("No similar artists found.");
                 }
             });
             break;
@@ -555,10 +610,10 @@ bot.on('chat', function(data) {
                     upcomingEvents=upcomingEvents.replace(/Oct/g, '10');
                     upcomingEvents=upcomingEvents.replace(/Nov/g, '11');
                     upcomingEvents=upcomingEvents.replace(/Dec/g, '12');
-                    bot.sendChat("Upcoming events for " + artistChoice + ": " + upcomingEvents);
+                    bot.chat("Upcoming events for " + artistChoice + ": " + upcomingEvents);
                 }
                 else{
-                    bot.sendChat("No upcoming events found.");
+                    bot.chat("No upcoming events found.");
                 }
             });
             break;
@@ -576,39 +631,39 @@ bot.on('chat', function(data) {
                 if (!error && response.statusCode == 200) {
                     var info = JSON.parse(body);
                     if (info[0] != undefined){
-                        bot.sendChat(info[0].username + ": " + info[0].permalink_url);
+                        bot.chat(info[0].username + ": " + info[0].permalink_url);
                     }
                     else{
-                        bot.sendChat("No soundcloud found.");
+                        bot.chat("No soundcloud found.");
                     }
                 }
             });
             break;
 
-        case ".grab": //Makes the bot grab the current song
-            for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
-                    bot.getPlaylists(function(playlists) {
-                        console.log(playlists);
-                        for (var i=0; i<playlists.length; i++){
-                            if (playlists[i].active){
-                                if (playlists[i].count!=200){
-                                    var selectedID=playlists[i].id;
-                                    bot.sendChat("Added to my "+playlists[i].name+" playlist.");
-                                }
-                                else{
-                                    bot.createPlaylist("Library "+playlists.length+1);
-                                    bot.activatePlaylist(playlists[playlists.length-1].id);
-                                    var selectedID=playlists[playlists.length-1].id;
-                                    bot.sendChat("Added to "+playlists[playlists.length-1].name+" playlist.");
-                                }
-                            }
-                        }
-                        bot.addSongToPlaylist(selectedID, media.id);
-                    });
-                }
-            }
-            break;
+        // case ".grab": //Makes the bot grab the current song
+        //     for (var i=0; i<staff.length; i++){
+        //         if (staff[i].username == data.un && staff[i].role > 1){
+        //             bot.getPlaylists(function(playlists) {
+        //                 console.log(playlists);
+        //                 for (var i=0; i<playlists.length; i++){
+        //                     if (playlists[i].active){
+        //                         if (playlists[i].count!=200){
+        //                             var selectedID=playlists[i].id;
+        //                             bot.chat("Added to my "+playlists[i].name+" playlist.");
+        //                         }
+        //                         else{
+        //                             bot.createPlaylist("Library "+playlists.length+1);
+        //                             bot.activatePlaylist(playlists[playlists.length-1].id);
+        //                             var selectedID=playlists[playlists.length-1].id;
+        //                             bot.chat("Added to "+playlists[playlists.length-1].name+" playlist.");
+        //                         }
+        //                     }
+        //                 }
+        //                 bot.addSongToPlaylist(selectedID, media.id);
+        //             });
+        //         }
+        //     }
+        //     break;
 
         case ".define": //Returns the Merriam-Webster dictionary definition of a given word with .define [givenWord]
             if (qualifier!=""){
@@ -641,16 +696,16 @@ bot.on('chat', function(data) {
                         if (result.length>250){
                             result=result.substring(0, 247)+"...";
                         }  
-                        bot.sendChat(result);
-                        //bot.sendChat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
+                        bot.chat(result);
+                        //bot.chat("For more info: http://www.merriam-webster.com/dictionary/" + linkQualifier);
                     }
                     else{
-                        bot.sendChat("No definition found.");
+                        bot.chat("No definition found.");
                     }
                 });
             }
             else{
-                bot.sendChat("Try .define followed by something to look up.");
+                bot.chat("Try .define followed by something to look up.");
             }
             break;
         case ".wiki": //Returns Wikipedia article summary of a given query with .define [givenWord]
@@ -671,10 +726,10 @@ bot.on('chat', function(data) {
                                                     summary="redirect "+html;
                                                 }
                                                 if (summary.indexOf('may refer to:')!=-1 || summary.indexOf('can refer to:')!=-1 || summary.indexOf('may also refer to:')!=-1 || summary.indexOf('may refer to the following:')!=-1 || summary.indexOf('may stand for:')!=-1){
-                                                    bot.sendChat("This may refer to several things - please be more specific.");
+                                                    bot.chat("This may refer to several things - please be more specific.");
                                                     var queryChoice=qualifier;
                                                     queryChoice=queryChoice.replace(/ /g, '_');
-                                                    bot.sendChat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
+                                                    bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                 }
                                                 else if (summary.substring(0,8).toLowerCase()=="redirect"){
                                                     subQuery='';
@@ -694,27 +749,27 @@ bot.on('chat', function(data) {
                                                         page2.content(function(err, content){
                                                             if (content!=undefined){
                                                                 if (content.indexOf('may refer to:')!=-1 || content.indexOf('can refer to:')!=-1 || content.indexOf('may also refer to:')!=-1 || content.indexOf('may refer to the following:')!=-1 || content.indexOf('may stand for:')!=-1){
-                                                                    bot.sendChat("This may refer to several things - please be more specific.");
+                                                                    bot.chat("This may refer to several things - please be more specific.");
                                                                 }
                                                                 else if (subQuery!=''){
                                                                     content=content.substring(content.indexOf("=== "+subQuery+" ===")+8+subQuery.length);
                                                                     if (content.length>250){
                                                                         content=content.substring(0, 247)+"...";
                                                                     }  
-                                                                    bot.sendChat(content);
+                                                                    bot.chat(content);
                                                                 }
                                                                 else{
                                                                     if (content.length>250){
                                                                         content=content.substring(0, 247)+"...";
                                                                     }  
-                                                                    bot.sendChat(content);
+                                                                    bot.chat(content);
                                                                 }
                                                                 var queryChoice=qualifier;
                                                                 queryChoice=queryChoice.replace(/ /g, '_');
-                                                                bot.sendChat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
+                                                                bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                             }
                                                             else{
-                                                                bot.sendChat("No wiki found.");
+                                                                bot.chat("No wiki found.");
                                                             }
                                                         });
                                                     });
@@ -723,14 +778,14 @@ bot.on('chat', function(data) {
                                                     if (summary.length>250){
                                                         summary=summary.substring(0, 247)+"...";
                                                     }  
-                                                    bot.sendChat(summary);
+                                                    bot.chat(summary);
                                                     var queryChoice=qualifier;
                                                     queryChoice=queryChoice.replace(/ /g, '_');
-                                                    bot.sendChat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
+                                                    bot.chat("For more info: http://en.wikipedia.org/wiki/" + queryChoice);
                                                 }
                                             }
                                             else{
-                                                bot.sendChat("No wiki found.");
+                                                bot.chat("No wiki found.");
                                             }    
                                         });
                                     });
@@ -738,19 +793,19 @@ bot.on('chat', function(data) {
                             });
                         }
                         else{
-                            bot.sendChat("No wiki found.");
+                            bot.chat("No wiki found.");
                         } 
                     });
                 });
             }
             else{
-                bot.sendChat("Try .wiki followed by something to look up.");
+                bot.chat("Try .wiki followed by something to look up.");
             }
             break;
         case ".forecast": //Returns a four day forecast of the weather in given city with .forecast [givenCity], [givenState]
         case ".weather":
             if (qualifier==""){
-                bot.sendChat("Try .forecast followed by a US state, city, or zip to look up.");
+                bot.chat("Try .forecast followed by a US state, city, or zip to look up.");
             }
             else{
                 google_geocoding.geocode(qualifier, function(err, location) {
@@ -775,15 +830,15 @@ bot.on('chat', function(data) {
                                 weekForecast=weekForecast.replace(/Thursday/g, 'Thurs');
                                 weekForecast=weekForecast.replace(/Friday/g, 'Fri');
                                 weekForecast=weekForecast.replace(/Saturday/g, 'Sat');
-                                bot.sendChat(weekForecast);
+                                bot.chat(weekForecast);
                             }
                             else{
-                                bot.sendChat("No weather found.");
+                                bot.chat("No weather found.");
                             }
                         });
                     }
                     else{
-                        bot.sendChat("No weather found.");
+                        bot.chat("No weather found.");
                     }
                 });
             }
@@ -791,7 +846,7 @@ bot.on('chat', function(data) {
         case ".temp": //Returns the current temperature in given city with .temp [givenCity], [givenState]
         case ".temperature":
             if (qualifier==""){
-                bot.sendChat("Try .temp followed by a US state, city, or zip to look up.");
+                bot.chat("Try .temp followed by a US state, city, or zip to look up.");
             }
             else{
                 google_geocoding.geocode(qualifier, function(err, location) {
@@ -799,22 +854,22 @@ bot.on('chat', function(data) {
                         weather.getWeather(location.lat, location.lng, function(err, data){
                             if (data!=null){
                                 var temp="Current temperature in "+data.location.areaDescription+": "+data.currentobservation.Temp+"°F "+data.currentobservation.Weather;
-                                bot.sendChat(temp);
+                                bot.chat(temp);
                             }
                             else{
-                                bot.sendChat("No temperature found.");
+                                bot.chat("No temperature found.");
                             }
                         });
                     }
                     else{
-                        bot.sendChat("No temperature found.");
+                        bot.chat("No temperature found.");
                     }
                 });
             }
             break;
         case ".time": //Returns the current time in a given city with .time [givenCity], givenState]
             if (qualifier==""){
-                bot.sendChat("Try .time followed by a place to look up.");
+                bot.chat("Try .time followed by a place to look up.");
             }
             else{
                 google_geocoding.geocode(qualifier, function(err, location) {
@@ -852,13 +907,13 @@ bot.on('chat', function(data) {
                                     if (info.geonames[0].adminName1 != ''){
                                         stateOrCity = info.geonames[0].adminName1 + ", ";
                                     }
-                                    bot.sendChat("Current time in " + stateOrCity + info.geonames[0].countryName + ": " + hours + mins + " " + ampm);
+                                    bot.chat("Current time in " + stateOrCity + info.geonames[0].countryName + ": " + hours + mins + " " + ampm);
                                 }
                             }
                         });
                     }
                     else{
-                        bot.sendChat("No time found.");
+                        bot.chat("No time found.");
                     }
                 });
             }
@@ -882,21 +937,21 @@ bot.on('chat', function(data) {
                 var answer=(realfunc({x:0,y:0}));
                 if (answer.toString()!="NaN"){
                     if (answer.toString()!="Infinity"){
-                        bot.sendChat(answer.toString());
+                        bot.chat(answer.toString());
                     }
                     else{
-                        bot.sendChat('http://i.imgur.com/KpAzEs8.jpg');
+                        bot.chat('http://i.imgur.com/KpAzEs8.jpg');
                     }
                 }
                 else{
-                    bot.sendChat("/me does not compute.");
+                    bot.chat("/me does not compute.");
                 }
             }
             else if (qualifier==""){
-                bot.sendChat("Try .calc followed by something to calculate.");
+                bot.chat("Try .calc followed by something to calculate.");
             }
             else{
-                bot.sendChat("/me does not compute.");
+                bot.chat("/me does not compute.");
             }
             break;
         case ".tl":
@@ -920,7 +975,7 @@ bot.on('chat', function(data) {
                                 };
                                 client.initialize_token(function(keys){ 
                                     client.translate(params2, function(err, data) {
-                                        bot.sendChat(data + " (" + languages[languageCodes.indexOf(language)] + ")");
+                                        bot.chat(data + " (" + languages[languageCodes.indexOf(language)] + ")");
                                     });
                                 });
                             }
@@ -943,35 +998,35 @@ bot.on('chat', function(data) {
                                     client.initialize_token(function(keys){ 
                                         client.translate(params2, function(err, data) {
                                             data = data.substring(0, data.indexOf('('));
-                                            bot.sendChat(data);
+                                            bot.chat(data);
                                         });
                                     });
                                 }
                                 else{
-                                    bot.sendChat("Sorry, I don't speak that language.");
+                                    bot.chat("Sorry, I don't speak that language.");
                                 }
                             }
                         }
                         else{
-                            bot.sendChat("Sorry, I don't speak that language.");
+                            bot.chat("Sorry, I don't speak that language.");
                         }
                     });
                 });
             }
             else{
-                bot.sendChat("Try .translate followed by something to translate.");
+                bot.chat("Try .translate followed by something to translate.");
             }
             break;
         case '.auto':
         case '.autotranslate': //Autotranslates a given user with .autotranslate [givenUser]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     if (qualifier!=""){
                         translateList.push(qualifier);
-                        bot.sendChat("Autotranslating user " + qualifier + ".");
+                        bot.chat("Autotranslating user " + qualifier + ".");
                     }
                     else{
-                        bot.sendChat("Try .autotranslate followed by a username.");
+                        bot.chat("Try .autotranslate followed by a username.");
                     }
                 }
             }
@@ -979,15 +1034,15 @@ bot.on('chat', function(data) {
         case '.undo':
         case '.untranslate': //Stops autotranslating a given user with .untranslate [givenUser]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     if (qualifier!=""){
                         if (translateList.indexOf(qualifier) != -1) {
                             translateList.splice(translateList.indexOf(qualifier), 1);
                         }
-                        bot.sendChat("Stopped autotranslating user " + qualifier + ".");
+                        bot.chat("Stopped autotranslating user " + qualifier + ".");
                     }
                     else{
-                        bot.sendChat("Try .untranslate followed by a username.");
+                        bot.chat("Try .untranslate followed by a username.");
                     }
                 }
             }
@@ -996,37 +1051,37 @@ bot.on('chat', function(data) {
             if (qualifier!=""){
                 var google=qualifier;
                 google=google.replace(/ /g, '+');
-                bot.sendChat("http://lmgtfy.com/?q=" + google);
+                bot.chat("http://lmgtfy.com/?q=" + google);
             }
             else{
-                bot.sendChat("Try .google followed by something to look up.");
+                bot.chat("Try .google followed by something to look up.");
             }
             break;    
         case ".autoskip": //Turns auto-skip on
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     setmehs = true;
-                    bot.sendChat("Auto-skip is now on.");
+                    bot.chat("Auto-skip is now on.");
                 }
             }
             break;
         case ".unskip": //Turns auto-skip off
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     setmehs = false;
-                    bot.sendChat("Auto-skip is now off.");
+                    bot.chat("Auto-skip is now off.");
                 }
             }
             break;
         case ".setmehs": //Sets the number of mehs for auto-skipping with .setmehs [givenNumber]
             for (var i=0; i<staff.length; i++){
-                if (staff[i].username == data.from && staff[i].role > 1){
+                if (staff[i].username == data.un && staff[i].role > 1){
                     if (qualifier!="" && !(isNaN(Number(qualifier)))){
                         mehs = qualifier - 1;
-                        bot.sendChat("Auto-skip set to " + (mehs+1) + " mehs.");
+                        bot.chat("Auto-skip set to " + (mehs+1) + " mehs.");
                     }
                     else{
-                        bot.sendChat("Try .setmehs followed a number of mehs for auto-skipping.");
+                        bot.chat("Try .setmehs followed a number of mehs for auto-skipping.");
                     }
                 }
             }
@@ -1034,14 +1089,14 @@ bot.on('chat', function(data) {
         default: //Checks for users that are set to be autotranslated whenever they chat
             var languageCodes = ["ar","bg","ca","zh-CHS","zh-CHT","cs","da","nl","en","et","fa","fi","fr","de","el","ht","he","hi","hu","id","it","ja","ko","lv","lt","ms","mww","no","pl","pt","ro","ru","sk","sl","es","sv","th","tr","uk","ur","vi"];
             var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese', 'Chinese', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian (Farsi)', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Hmong Daw', 'Norwegian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese'];        
-            if (translateList.indexOf(data.from)!=-1){
+            if (translateList.indexOf(data.un)!=-1){
                 qualifier = data.message;
                 qualifier=qualifier.replace(/&#39;/g, '\'');
                 qualifier=qualifier.replace(/&#34;/g, '\"');
                 qualifier=qualifier.replace(/&amp;/g, '\&');
                 qualifier=qualifier.replace(/&lt;/gi, '\<');
                 qualifier=qualifier.replace(/&gt;/gi, '\>');
-                var user = data.from;
+                var user = data.un;
                 var message = qualifier;
                 var params = { 
                     text: message 
@@ -1058,14 +1113,14 @@ bot.on('chat', function(data) {
                             };
                             client.initialize_token(function(keys){ 
                                 client.translate(params2, function(err, data) {
-                                    bot.sendChat(user + ": " + data + " (" + languages[languageCodes.indexOf(language)] + ")");
+                                    bot.chat(user + ": " + data + " (" + languages[languageCodes.indexOf(language)] + ")");
                                 });
                             });
                         }
                     });
                 });
             }
-            else if (command.charAt(0) == "@" && translateList.indexOf(command.slice(1)) != -1 && data.from != 'GeniusBot'){ //Autotranslates into @[givenUser]'s language when message begins with @[givenUser]
+            else if (command.charAt(0) == "@" && translateList.indexOf(command.slice(1)) != -1 && data.un != 'GeniusBot'){ //Autotranslates into @[givenUser]'s language when message begins with @[givenUser]
                 for (var i=0; i<users.length; i++){
                     if (users[i].username == command.slice(1)){
                         var params = { 
@@ -1076,7 +1131,7 @@ bot.on('chat', function(data) {
                         if (languageCodes.indexOf(users[i].language) > -1 && users[i].language != 'en'){
                             client.initialize_token(function(keys){ 
                                 client.translate(params, function(err, data){
-                                    bot.sendChat(command + " " + data);
+                                    bot.chat(command + " " + data);
                                 });
                             });
                         }
