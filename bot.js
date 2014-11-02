@@ -4,7 +4,7 @@ var bot = new PlugAPI({
     "email": "jbader@conncoll.edu",
     "password": "xxx"
 });
-var ROOM = 'chillout-mixer-ambient-triphop';
+var ROOM = 'terminally-chillin';
 bot.connect(ROOM); // The part after https://plug.dj
 
 var Lastfm = require('simple-lastfm'); //Use 'npm install simple-lastfm'
@@ -104,9 +104,8 @@ bot.on('advance', function(data) {
         });
     }
     // if (data.lastPlay.score != null) {
-    //     console.log(data.currentDJ.username + " " + data.media.title + " " + data.media.author);
     //     bot.chat("Last song: :thumbsup: " + data.lastPlay.score.positive + " :star: " + data.lastPlay.score.grabs + " :thumbsdown: " + data.lastPlay.score.negative);
-    //     bot.chat(":musical_note: " + data.currentDJ.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
+    //     bot.chat(":musical_note: " + data.dj.username + " started playing \"" + data.media.title + "\" by " + data.media.author + " :musical_note:");
     // }
 });
 
